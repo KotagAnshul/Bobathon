@@ -1,0 +1,37 @@
+{
+  "name": "bob-web-search-setup",
+  "displayName": "Bob Web Search Setup",
+  "description": "Installs and configures the Tavily web search MCP server for Bob.",
+  "version": "1.2.0",
+  "publisher": "bob",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bob/bob-web-search-setup"
+  },
+  "license": "MIT",
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "bob-web-search-setup.configure",
+        "title": "Bob: Configure Web Search (Tavily MCP)"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "package": "mkdir -p vsix/build && vsce package --out vsix/build/bob-web-search-setup-1.2.0.vsix"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "typescript": "^5.4.0"
+  }
+}
