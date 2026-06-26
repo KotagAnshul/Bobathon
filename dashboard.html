@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IBM Sales Intelligence Hub</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ibm-blue: #0F62FE;
+    --ibm-blue-hover: #0353E9;
+    --bg: #161616;
+    --surface: #262626;
+    --surface-2: #393939;
+    --border: #525252;
+    --text: #F4F4F4;
+    --text-muted: #A8A8A8;
+    --text-disabled: #6F6F6F;
+    --tag-opportunity: #198038;
+    --tag-opportunity-bg: #071908;
+    --tag-risk: #DA1E28;
+    --tag-risk-bg: #2D0709;
+    --tag-competitor: #8A3FFC;
+    --tag-competitor-bg: #1C0F30;
+    --tag-exec: #F1C21B;
+    --tag-exec-bg: #302400;
+    --green: #42BE65;
+    --yellow: #F1C21B;
+    --red: #FA4D56;
+    --font: -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+
+  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+  /* ── LOGIN ── */
+  #login-screen { display: flex; align-items: center; justify-content: center; height: 100vh; background: var(--bg); }
+  .login-card { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--ibm-blue); padding: 48px 40px; width: 420px; }
+  .login-card .ibm-logo { font-size: 28px; font-weight: 700; color: var(--ibm-blue); letter-spacing: -0.5px; margin-bottom: 6px; }
+  .login-card h2 { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .login-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 32px; }
+  .login-card label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .login-card select, .login-card input { width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; font-size: 14px; font-family: var(--font); margin-bottom: 20px; appearance: none; }
+  .login-card select:focus, .login-card input:focus { outline: 2px solid var(--ibm-blue); outline-offset: 0; }
+  .btn-primary { background: var(--ibm-blue); color: #fff; border: none; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; font-family: var(--font); }
+  .btn-primary:hover { background: var(--ibm-blue-hover); }
+
+  /* ── SHELL ── */
+  #app { display: none; flex-direction: row; height: 100vh; overflow: hidden; }
+  #app.visible { display: flex; }
+
+  /* ── TOP BAR ── */
+  .topbar { position: fixed; top: 0; left: 0; right: 0; height: 48px; background: #000; display: flex; align-items: center; padding: 0 16px; gap: 16px; z-index: 100; border-bottom: 1px solid var(--border); }
+  .topbar .ibm-logo { font-size: 18px; font-weight: 700; color: var(--ibm-blue); flex-shrink: 0; }
+  .topbar .app-name { font-size: 13px; color: var(--text-muted); border-left: 1px solid var(--border); padding-left: 16px; }
+  .topbar .spacer { flex: 1; }
+  .topbar .account-badge { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 4px 12px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .topbar .account-badge span { color: var(--ibm-blue); font-weight: 600; }
+  .topbar .rep-name { font-size: 13px; color: var(--text-muted); }
+
+  /* ── SIDEBAR ── */
+  .sidebar { width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); margin-top: 48px; overflow-y: auto; display: flex; flex-direction: column; }
+  .sidebar-section { padding: 16px 0 8px; }
+  .sidebar-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-disabled); padding: 0 16px; margin-bottom: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; cursor: pointer; color: var(--text-muted); font-size: 13px; border-left: 2px solid transparent; transition: background 0.1s; }
+  .nav-item:hover { background: var(--surface-2); color: var(--text); }
+  .nav-item.active { background: #0F62FE1A; color: var(--text); border-left-color: var(--ibm-blue); font-weight: 600; }
+  .nav-icon { width: 16px; text-align: center; flex-shrink: 0; }
+
+  /* ── MAIN ── */
+  .main { flex: 1; margin-top: 48px; overflow-y: auto; background: var(--bg); }
+  .tab-panel { display: none; padding: 24px 28px; max-width: 1100px; }
+  .tab-panel.active { display: block; }
+
+  /* ── SECTION HEADERS ── */
+  .section-header { margin-bottom: 20px; }
+  .section-header h1 { font-size: 20px; font-weight: 600; }
+  .section-header p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  /* ── CARDS ── */
+  .card { background: var(--surface); border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* ── TAGS ── */
+  .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .tag-opportunity { background: var(--tag-opportunity-bg); color: var(--green); border: 1px solid var(--tag-opportunity); }
+  .tag-risk { background: var(--tag-risk-bg); color: var(--red); border: 1px solid var(--tag-risk); }
+  .tag-competitor { background: var(--tag-competitor-bg); color: #BE95FF; border: 1px solid var(--tag-competitor); }
+  .tag-exec { background: var(--tag-exec-bg); color: var(--yellow); border: 1px solid #684E00; }
+  .tag-strong { background: #071908; color: var(--green); border: 1px solid var(--tag-opportunity); }
+  .tag-moderate { background: #302400; color: var(--yellow); border: 1px solid #684E00; }
+  .tag-cold { background: var(--tag-risk-bg); color: var(--red); border: 1px solid var(--tag-risk); }
+  .tag-advantaged { background: #071908; color: var(--green); border: 1px solid var(--tag-opportunity); }
+  .tag-even { background: #302400; color: var(--yellow); border: 1px solid #684E00; }
+  .tag-at-risk { background: var(--tag-risk-bg); color: var(--red); border: 1px solid var(--tag-risk); }
+  .tag-blue { background: #001141; color: #78A9FF; border: 1px solid #0043CE; }
+
+  /* ── NEWS ITEM ── */
+  .news-item { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ibm-blue); padding: 16px 18px; margin-bottom: 12px; display: flex; gap: 16px; align-items: flex-start; }
+  .news-item.flagged-important { border-left-color: var(--yellow); opacity: 0.7; }
+  .news-item.flagged-dismissed { opacity: 0.35; }
+  .news-body { flex: 1; }
+  .news-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .news-summary { font-size: 13px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+  .news-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+  .btn-sm { font-size: 11px; padding: 4px 10px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; font-family: var(--font); white-space: nowrap; }
+  .btn-sm:hover { background: var(--surface-2); color: var(--text); }
+  .btn-sm.active { background: var(--ibm-blue); color: #fff; border-color: var(--ibm-blue); }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 12px; border-bottom: 1px solid #333; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #2a2a2a; }
+
+  /* ── CHIP ── */
+  .chip { display: inline-block; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; padding: 2px 8px; border-radius: 12px; margin: 2px; }
+  .chip.ibm { background: #001141; color: #78A9FF; border-color: #0043CE; }
+
+  /* ── MEETING CARD ── */
+  .meeting-card { background: var(--surface); border: 1px solid var(--border); padding: 18px; margin-bottom: 14px; }
+  .meeting-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .meeting-title { font-size: 15px; font-weight: 600; }
+  .meeting-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+  .meeting-attendees { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .prep-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 2px; flex-shrink: 0; }
+  .prep-complete { background: #071908; color: var(--green); border: 1px solid var(--tag-opportunity); }
+  .prep-needs { background: #302400; color: var(--yellow); border: 1px solid #684E00; }
+  .prep-no { background: var(--tag-risk-bg); color: var(--red); border: 1px solid var(--tag-risk); }
+
+  /* ── STAT CARDS ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); padding: 16px; }
+  .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 700; color: var(--text); }
+  .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar { height: 6px; background: var(--surface-2); border-radius: 0; margin-top: 6px; }
+  .progress-fill { height: 100%; background: var(--ibm-blue); }
+  .progress-fill.high { background: var(--red); }
+  .progress-fill.warn { background: var(--yellow); }
+
+  /* ── BULLET SUMMARY ── */
+  .bullet-list { list-style: none; }
+  .bullet-list li { padding: 8px 0; border-bottom: 1px solid #333; font-size: 13px; display: flex; gap: 10px; align-items: flex-start; }
+  .bullet-list li:last-child { border-bottom: none; }
+  .bullet-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ibm-blue); margin-top: 7px; flex-shrink: 0; }
+
+  /* ── AGENT LAUNCHPAD ── */
+  .agent-card { background: var(--surface); border: 1px solid var(--border); padding: 20px; cursor: pointer; transition: border-color 0.15s; }
+  .agent-card:hover { border-color: var(--ibm-blue); }
+  .agent-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .agent-card p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .agent-icon { font-size: 20px; margin-bottom: 10px; color: var(--ibm-blue); }
+  .agent-result { background: var(--surface-2); border: 1px solid var(--border); padding: 16px; margin-top: 12px; font-size: 13px; display: none; }
+  .agent-result.visible { display: block; }
+  .agent-result pre { white-space: pre-wrap; word-break: break-word; font-family: "Courier New", monospace; font-size: 12px; color: var(--text-muted); }
+
+  /* ── MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--ibm-blue); width: 640px; max-height: 80vh; overflow-y: auto; padding: 28px; }
+  .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+  .modal h2 { font-size: 17px; font-weight: 600; }
+  .modal-close { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; line-height: 1; }
+  .modal-section { margin-bottom: 18px; }
+  .modal-section h4 { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .modal-section ul { list-style: none; }
+  .modal-section ul li { padding: 5px 0; font-size: 13px; border-bottom: 1px solid #333; display: flex; gap: 8px; }
+  .modal-section ul li:last-child { border-bottom: none; }
+  .modal-section ul li::before { content: "›"; color: var(--ibm-blue); font-weight: 700; flex-shrink: 0; }
+
+  /* ── CHATBOT ── */
+  .chat-fab { position: fixed; top: 60px; right: 28px; width: auto; height: 36px; border-radius: 2px; background: var(--ibm-blue); border: none; color: #fff; font-size: 13px; font-weight: 600; font-family: var(--font); padding: 0 16px; cursor: pointer; z-index: 150; display: none; align-items: center; gap: 8px; }
+  .chat-fab.visible { display: flex; }
+  .chat-fab:hover { background: var(--ibm-blue-hover); }
+  .chat-panel { position: fixed; top: 104px; right: 28px; width: 380px; height: 520px; background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--ibm-blue); z-index: 150; display: none; flex-direction: column; }
+  .chat-panel.open { display: flex; }
+  .chat-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .chat-header h3 { font-size: 14px; font-weight: 600; }
+  .chat-header span { font-size: 11px; color: var(--green); }
+  .chat-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .msg { max-width: 85%; }
+  .msg-bob { align-self: flex-start; }
+  .msg-user { align-self: flex-end; }
+  .msg-bubble { padding: 10px 14px; font-size: 13px; line-height: 1.5; }
+  .msg-bob .msg-bubble { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); }
+  .msg-user .msg-bubble { background: var(--ibm-blue); color: #fff; }
+  .msg-name { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
+  .msg-user .msg-name { text-align: right; }
+  .chat-input-row { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+  .chat-input-row input { flex: 1; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; font-size: 13px; font-family: var(--font); }
+  .chat-input-row input:focus { outline: 2px solid var(--ibm-blue); outline-offset: 0; }
+  .chat-send { background: var(--ibm-blue); color: #fff; border: none; padding: 8px 14px; cursor: pointer; font-family: var(--font); font-size: 13px; }
+  .chat-send:hover { background: var(--ibm-blue-hover); }
+  .chat-suggestions { padding: 0 16px 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .chat-suggest-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; padding: 4px 10px; cursor: pointer; font-family: var(--font); }
+  .chat-suggest-btn:hover { border-color: var(--ibm-blue); color: var(--text); }
+
+  /* ── UTILITY ── */
+  .flex-row { display: flex; align-items: center; gap: 10px; }
+  .text-muted { color: var(--text-muted); }
+  .text-green { color: var(--green); }
+  .text-red { color: var(--red); }
+  .text-yellow { color: var(--yellow); }
+  .text-blue { color: #78A9FF; }
+  .mt-4 { margin-top: 16px; }
+  .mb-4 { margin-bottom: 16px; }
+  .copy-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 14px; font-size: 12px; cursor: pointer; font-family: var(--font); }
+  .copy-btn:hover { background: var(--surface-2); }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .renewal-alert { background: #2D1800; border: 1px solid #684E00; color: var(--yellow); font-size: 12px; padding: 6px 12px; margin-bottom: 8px; }
+  .upsell-alert { background: #001141; border: 1px solid #0043CE; color: #78A9FF; font-size: 12px; padding: 6px 12px; margin-bottom: 8px; }
+
+  /* ── TOAST ── */
+  #toast-container { position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+  .toast { background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--ibm-blue); color: var(--text); font-size: 13px; padding: 10px 18px; min-width: 280px; max-width: 460px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .toast.toast-success { border-left-color: var(--green); }
+  .toast.toast-warn { border-left-color: var(--yellow); }
+
+  /* ── LOG NOTE ── */
+  .log-note-row { display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+  .log-note-row input { flex: 1; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 7px 10px; font-size: 12px; font-family: var(--font); }
+  .log-note-row input:focus { outline: 2px solid var(--ibm-blue); outline-offset: 0; }
+  .log-note-row button { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; font-size: 12px; cursor: pointer; font-family: var(--font); white-space: nowrap; }
+  .log-note-row button:hover { background: var(--ibm-blue); color: #fff; border-color: var(--ibm-blue); }
+
+  /* ── AGENT CARD LOADING ── */
+  .agent-card .run-btn { display: inline-block; margin-top: 10px; font-size: 11px; padding: 4px 12px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; font-family: var(--font); }
+  .agent-card .run-btn:hover { border-color: var(--ibm-blue); color: var(--text); }
+  .agent-loading { font-size: 12px; color: var(--text-muted); padding: 10px 0; display: none; }
+  .agent-loading.visible { display: block; }
+
+  /* ── CRM FORM ── */
+  .crm-form { display: flex; flex-direction: column; gap: 8px; }
+  .crm-form select, .crm-form input { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 7px 10px; font-size: 12px; font-family: var(--font); width: 100%; appearance: none; }
+  .crm-form select:focus, .crm-form input:focus { outline: 2px solid var(--ibm-blue); outline-offset: 0; }
+  .crm-form label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  .crm-form .crm-submit { background: var(--ibm-blue); color: #fff; border: none; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font); margin-top: 4px; }
+  .crm-form .crm-submit:hover { background: var(--ibm-blue-hover); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ LOGIN ═══════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="ibm-logo">IBM</div>
+    <h2>Sales Intelligence Hub</h2>
+    <p>Powered by watsonx Orchestrate — Bob</p>
+    <label for="rep-name">Your Name</label>
+    <input id="rep-name" type="text" value="Sarah Mitchell" />
+    <label for="account-select">Select Account</label>
+    <select id="account-select">
+      <option value="Accenture">Accenture</option>
+      <option value="JPMorgan Chase">JPMorgan Chase</option>
+      <option value="KPMG">KPMG</option>
+      <option value="EY">EY</option>
+    </select>
+    <button class="btn-primary" onclick="launchDashboard()">Launch Dashboard</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ APP SHELL ═══════════════════ -->
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="ibm-logo">IBM</div>
+    <div class="app-name">Sales Intelligence Hub</div>
+    <div class="spacer"></div>
+    <div class="account-badge">Account: <span id="topbar-account">Accenture</span></div>
+    <div class="rep-name" id="topbar-rep">Sarah Mitchell</div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container"></div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Intelligence</div>
+      <div class="nav-item active" onclick="showTab('news')">
+        <span class="nav-icon">📰</span> Morning News
+      </div>
+      <div class="nav-item" onclick="showTab('account')">
+        <span class="nav-icon">🏢</span> Account Overview
+      </div>
+      <div class="nav-item" onclick="showTab('competitor')">
+        <span class="nav-icon">⚔️</span> Competitor Analysis
+      </div>
+      <div class="nav-item" onclick="showTab('exec')">
+        <span class="nav-icon">📋</span> Executive Summary
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Relationships</div>
+      <div class="nav-item" onclick="showTab('meetings')">
+        <span class="nav-icon">📅</span> Meetings
+      </div>
+      <div class="nav-item" onclick="showTab('partnerships')">
+        <span class="nav-icon">🤝</span> IBM Partnerships
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">AI Tools</div>
+      <div class="nav-item" onclick="showTab('launchpad')">
+        <span class="nav-icon">🚀</span> Agent Launchpad
+      </div>
+      <div class="nav-item" onclick="showTab('chatbot'); openChat()">
+        <span class="nav-icon">💬</span> Ask Bob
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- ── TAB: MORNING NEWS ── -->
+    <div class="tab-panel active" id="tab-news">
+      <div class="section-header">
+        <h1>Morning News &amp; Alerts — <span class="section-account"></span></h1>
+        <p>Account-specific news and industry alerts — refreshed daily. In production, powered by Tavily.</p>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="card-title">Industry Alerts</div>
+          <div style="margin-bottom:12px;">
+            <div style="font-weight:600;font-size:13px;">EU AI Act Enforcement Begins Q3 2026</div>
+            <div class="text-muted" style="font-size:12px;margin-top:3px;">High-risk AI systems must demonstrate model transparency and audit trails. IBM watsonx.governance directly applies.</div>
+          </div>
+          <hr class="divider" style="margin:10px 0;" />
+          <div style="margin-bottom:12px;">
+            <div style="font-weight:600;font-size:13px;">Cloud Spending Trends Q2 2026: +28% YoY</div>
+            <div class="text-muted" style="font-size:12px;margin-top:3px;">Enterprise AI workloads drive hybrid cloud growth — favours IBM Cloud Pak for Data positioning.</div>
+          </div>
+          <hr class="divider" style="margin:10px 0;" />
+          <div>
+            <div style="font-weight:600;font-size:13px;">Tech Consulting M&A: 3 Deals Close This Quarter</div>
+            <div class="text-muted" style="font-size:12px;margin-top:3px;">AI and data capability consolidation — reassess partner and competitive landscape.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">News Summary — Accenture</div>
+          <div class="flex-row" style="margin-bottom:8px;">
+            <div class="stat-value" style="font-size:28px;">6</div>
+            <div class="text-muted">news items today</div>
+          </div>
+          <div class="pill-row">
+            <span class="tag tag-opportunity">2 Opportunities</span>
+            <span class="tag tag-risk">1 Risk</span>
+            <span class="tag tag-competitor">1 Competitor Move</span>
+            <span class="tag tag-exec">1 Executive Change</span>
+          </div>
+          <hr class="divider" style="margin:12px 0;" />
+          <div class="text-muted" style="font-size:12px;">Last refreshed: Today, 06:00 AM</div>
+          <div class="text-muted" style="font-size:12px;">Source: Reuters · Bloomberg · WSJ · FT · TechCrunch</div>
+        </div>
+      </div>
+
+      <div id="news-feed">
+        <div class="news-item" id="ni-news_001">
+          <div class="news-body">
+            <div class="flex-row"><span class="tag tag-competitor">Competitor Move</span></div>
+            <div style="font-weight:600;margin-top:6px;">Accenture Expands AWS Partnership with $3B Cloud Migration Commitment</div>
+            <div class="news-meta">Reuters · June 10, 2026</div>
+            <div class="news-summary">Accenture has announced a deepened strategic alliance with AWS to migrate Fortune 500 clients to cloud infrastructure, potentially displacing IBM Cloud workloads.</div>
+          </div>
+          <div class="news-actions">
+            <button class="btn-sm" onclick="flagNews('news_001','Important',this)">⚑ Important</button>
+            <button class="btn-sm" onclick="flagNews('news_001','Share with Team',this)">↗ Share</button>
+            <button class="btn-sm" onclick="flagNews('news_001','Dismiss',this)">✕ Dismiss</button>
+          </div>
+        </div>
+        <div class="news-item" id="ni-news_002">
+          <div class="news-body">
+            <div class="flex-row"><span class="tag tag-exec">Executive Change</span></div>
+            <div style="font-weight:600;margin-top:6px;">Accenture Names New Chief AI Officer Following watsonx Pilot Success</div>
+            <div class="news-meta">Bloomberg · June 8, 2026</div>
+            <div class="news-summary">Dr. Priya Nair appointed CAO, citing the successful enterprise AI pilot with IBM watsonx as a key driver. Engage immediately — strong IBM advocate.</div>
+          </div>
+          <div class="news-actions">
+            <button class="btn-sm" onclick="flagNews('news_002','Important',this)">⚑ Important</button>
+            <button class="btn-sm" onclick="flagNews('news_002','Share with Team',this)">↗ Share</button>
+            <button class="btn-sm" onclick="flagNews('news_002','Dismiss',this)">✕ Dismiss</button>
+          </div>
+        </div>
+        <div class="news-item" id="ni-news_003">
+          <div class="news-body">
+            <div class="flex-row"><span class="tag tag-opportunity">Opportunity</span></div>
+            <div style="font-weight:600;margin-top:6px;">Accenture Q2 2026 Earnings: AI &amp; Cloud Revenue Up 34% YoY</div>
+            <div class="news-meta">Wall Street Journal · June 5, 2026</div>
+            <div class="news-summary">Strong Q2 results signal increased enterprise AI budget — prime timing for watsonx expansion proposal.</div>
+          </div>
+          <div class="news-actions">
+            <button class="btn-sm" onclick="flagNews('news_003','Important',this)">⚑ Important</button>
+            <button class="btn-sm" onclick="flagNews('news_003','Share with Team',this)">↗ Share</button>
+            <button class="btn-sm" onclick="flagNews('news_003','Dismiss',this)">✕ Dismiss</button>
+          </div>
+        </div>
+        <div class="news-item" id="ni-news_004">
+          <div class="news-body">
+            <div class="flex-row"><span class="tag tag-opportunity">Opportunity</span></div>
+            <div style="font-weight:600;margin-top:6px;">EU AI Act Compliance Deadline Pressures Accenture's FS Division</div>
+            <div class="news-meta">Financial Times · June 3, 2026</div>
+            <div class="news-summary">IBM watsonx.governance is positioned as a key compliance enabler. Renewal due September 2026 — align timing with EU deadline urgency.</div>
+          </div>
+          <div class="news-actions">
+            <button class="btn-sm" onclick="flagNews('news_004','Important',this)">⚑ Important</button>
+            <button class="btn-sm" onclick="flagNews('news_004','Share with Team',this)">↗ Share</button>
+            <button class="btn-sm" onclick="flagNews('news_004','Dismiss',this)">✕ Dismiss</button>
+          </div>
+        </div>
+        <div class="news-item" id="ni-news_005">
+          <div class="news-body">
+            <div class="flex-row"><span class="tag tag-risk">Risk</span></div>
+            <div style="font-weight:600;margin-top:6px;">Accenture Explores Microsoft Azure OpenAI for Internal Automation</div>
+            <div class="news-meta">TechCrunch · May 29, 2026</div>
+            <div class="news-summary">Parallel Azure OpenAI PoC underway — competitive pressure on IBM watsonx deals. Prepare battlecard and governance differentiators.</div>
+          </div>
+          <div class="news-actions">
+            <button class="btn-sm" onclick="flagNews('news_005','Important',this)">⚑ Important</button>
+            <button class="btn-sm" onclick="flagNews('news_005','Share with Team',this)">↗ Share</button>
+            <button class="btn-sm" onclick="flagNews('news_005','Dismiss',this)">✕ Dismiss</button>
+          </div>
+        </div>
+        <div class="news-item" id="ni-news_006">
+          <div class="news-body">
+            <div class="flex-row"><span class="tag tag-opportunity">Opportunity</span></div>
+            <div style="font-weight:600;margin-top:6px;">Accenture Sterling Supply Chain Implementation Wins Industry Award</div>
+            <div class="news-meta">Supply Chain Dive · May 25, 2026</div>
+            <div class="news-summary">The IBM Sterling-powered implementation won the 2026 Digital Supply Chain Excellence Award — reinforces the IBM–Accenture partnership story.</div>
+          </div>
+          <div class="news-actions">
+            <button class="btn-sm" onclick="flagNews('news_006','Important',this)">⚑ Important</button>
+            <button class="btn-sm" onclick="flagNews('news_006','Share with Team',this)">↗ Share</button>
+            <button class="btn-sm" onclick="flagNews('news_006','Dismiss',this)">✕ Dismiss</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: ACCOUNT OVERVIEW ── -->
+    <div class="tab-panel" id="tab-account">
+      <div class="section-header">
+        <h1>Account Overview — <span class="section-account"></span></h1>
+        <p>IBM ISC Cloud data, active products, and account profile. In production, live-synced from IBM ISC Cloud APIs.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">Annual Revenue</div>
+          <div class="stat-value">$64.9B</div>
+          <div class="stat-sub">FY2025</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Employees</div>
+          <div class="stat-value">774K+</div>
+          <div class="stat-sub">Global</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">IBM Account Tier</div>
+          <div class="stat-value text-blue">Strategic</div>
+          <div class="stat-sub">Since 2004</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Relationship Score</div>
+          <div class="stat-value text-green">8.2 / 10</div>
+          <div class="stat-sub">Strong</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Account Profile</div>
+          <table>
+            <tr><td class="text-muted" style="width:40%">Industry</td><td>Technology Consulting / Financial Services</td></tr>
+            <tr><td class="text-muted">HQ</td><td>Dublin, Ireland · New York · London · Mumbai</td></tr>
+            <tr><td class="text-muted">Sales Stage</td><td><span class="tag tag-blue">Proposal — watsonx Expansion</span></td></tr>
+            <tr><td class="text-muted">Primary Contact</td><td>Sarah Mitchell, IBM GAE</td></tr>
+            <tr><td class="text-muted">Technical Lead</td><td>James Okonkwo, IBM TSL</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-title">Open Support Tickets</div>
+          <div style="margin-bottom:12px;">
+            <div class="flex-row"><span class="tag tag-risk">Sev 2</span> <strong>INC0042871</strong></div>
+            <div style="font-size:13px;margin-top:4px;">IBM Cloud Pak for Data — DataStage pipeline latency spike in production cluster</div>
+            <div class="text-muted" style="font-size:12px;margin-top:2px;">Opened June 8 · In Progress</div>
+          </div>
+          <hr class="divider" style="margin:10px 0;" />
+          <div>
+            <div class="flex-row"><span class="tag tag-exec">Sev 3</span> <strong>INC0044102</strong></div>
+            <div style="font-size:13px;margin-top:4px;">IBM watsonx.ai — API rate limit errors on batch inference jobs</div>
+            <div class="text-muted" style="font-size:12px;margin-top:2px;">Opened June 11 · Assigned</div>
+          </div>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-title">Active IBM Products &amp; Licenses</div>
+        <div class="renewal-alert">⚠ Renewal Alert: IBM watsonx.governance — due September 30, 2026 (90 days)</div>
+        <div class="upsell-alert">↑ Upsell Signal: IBM Cloud Pak for Data at 88% utilisation — capacity expansion candidate</div>
+        <div class="upsell-alert">↑ Upsell Signal: IBM Sterling at 93% utilisation — evaluate premium tier upgrade</div>
+        <table style="margin-top:8px;">
+          <thead><tr><th>Product</th><th>License</th><th>Seats</th><th>Renewal</th><th>Usage</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>IBM watsonx.ai</td><td>Enterprise</td><td>2,500</td><td>Dec 31, 2026</td>
+              <td><div>74%</div><div class="progress-bar"><div class="progress-fill" style="width:74%"></div></div></td>
+              <td><span class="tag tag-advantaged">Active</span></td>
+            </tr>
+            <tr>
+              <td>IBM watsonx.governance</td><td>Professional</td><td>800</td><td>Sep 30, 2026</td>
+              <td><div>61%</div><div class="progress-bar"><div class="progress-fill warn" style="width:61%"></div></div></td>
+              <td><span class="tag tag-exec">Renewal Alert</span></td>
+            </tr>
+            <tr>
+              <td>IBM Cloud Pak for Data</td><td>Enterprise</td><td>1,200</td><td>Mar 15, 2027</td>
+              <td><div>88%</div><div class="progress-bar"><div class="progress-fill high" style="width:88%"></div></div></td>
+              <td><span class="tag tag-competitor">Upsell</span></td>
+            </tr>
+            <tr>
+              <td>IBM Sterling Supply Chain</td><td>Enterprise</td><td>450</td><td>Nov 1, 2026</td>
+              <td><div>93%</div><div class="progress-bar"><div class="progress-fill high" style="width:93%"></div></div></td>
+              <td><span class="tag tag-advantaged">Active</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── TAB: COMPETITOR ANALYSIS ── -->
+    <div class="tab-panel" id="tab-competitor">
+      <div class="section-header">
+        <h1>Competitor Analysis — <span class="section-account"></span></h1>
+        <p>Active competitors — click a row to view the full IBM battlecard.</p>
+      </div>
+      <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card"><div class="stat-label">Wins (12 mo)</div><div class="stat-value text-green">3</div></div>
+        <div class="stat-card"><div class="stat-label">Losses (12 mo)</div><div class="stat-value text-red">2</div></div>
+        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value text-yellow">2</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Active Competitors</div>
+        <table>
+          <thead><tr><th>Competitor</th><th>Products Considered</th><th>Est. Deal Size</th><th>IBM Position</th><th>Battlecard</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Microsoft</strong></td>
+              <td>Azure OpenAI · Copilot M365 · Azure ML</td>
+              <td>$5.2M</td>
+              <td><span class="tag tag-at-risk">At Risk</span></td>
+              <td><button class="btn-sm" onclick="openBattlecard('Microsoft')">View Battlecard</button></td>
+            </tr>
+            <tr>
+              <td><strong>Google Cloud</strong></td>
+              <td>Vertex AI · BigQuery ML · Gemini</td>
+              <td>$3.1M</td>
+              <td><span class="tag tag-even">Even</span></td>
+              <td><button class="btn-sm" onclick="openBattlecard('Google Cloud')">View Battlecard</button></td>
+            </tr>
+            <tr>
+              <td><strong>AWS</strong></td>
+              <td>Amazon Bedrock · SageMaker · AWS Supply Chain</td>
+              <td>$7.8M</td>
+              <td><span class="tag tag-at-risk">At Risk</span></td>
+              <td><button class="btn-sm" onclick="openBattlecard('AWS')">View Battlecard</button></td>
+            </tr>
+            <tr>
+              <td><strong>Salesforce</strong></td>
+              <td>Einstein AI · Data Cloud · Agentforce</td>
+              <td>$1.4M</td>
+              <td><span class="tag tag-advantaged">Advantaged</span></td>
+              <td><button class="btn-sm" onclick="openBattlecard('Salesforce')">View Battlecard</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card mt-4">
+        <div class="card-title">Recent Win / Loss Summary</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Period: June 2025 – June 2026</div>
+        <table>
+          <thead><tr><th>Outcome</th><th>Deal</th><th>Value</th><th>Close Date</th><th>Reason</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag tag-advantaged">Win</span></td><td>IBM Sterling Renewal &amp; Expansion</td><td>$4.1M</td><td>Feb 15, 2026</td><td class="text-muted">Deep implementation track record vs AWS Supply Chain cost pitch.</td></tr>
+            <tr><td><span class="tag tag-advantaged">Win</span></td><td>watsonx.ai FS Pilot → Production</td><td>$3.2M</td><td>Nov 30, 2025</td><td class="text-muted">Successful PoC + EU AI Act compliance capabilities beat Google Vertex AI.</td></tr>
+            <tr><td><span class="tag tag-advantaged">Win</span></td><td>Cloud Pak for Data Expansion</td><td>$1.8M</td><td>Aug 20, 2025</td><td class="text-muted">High utilisation (88%) — no credible competitive alternative.</td></tr>
+            <tr><td><span class="tag tag-at-risk">Loss</span></td><td>Internal Automation Platform</td><td>$2.4M</td><td>Jan 10, 2026</td><td class="text-muted">Microsoft M365 footprint + bundled pricing reduced switching cost.</td></tr>
+            <tr><td><span class="tag tag-at-risk">Loss</span></td><td>HR Analytics Platform</td><td>$0.9M</td><td>Sep 5, 2025</td><td class="text-muted">Workday native HR AI preferred for this specific use case.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── TAB: EXECUTIVE SUMMARY ── -->
+    <div class="tab-panel" id="tab-exec">
+      <div class="section-header">
+        <h1>Executive Summary — <span class="section-account"></span></h1>
+        <p>Call-prep brief for <span id="exec-rep-name">Sarah Mitchell</span> · Generated <span id="exec-date"></span></p>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        <button class="copy-btn" onclick="copyExecSummary()">⎘ Copy to Clipboard</button>
+      </div>
+      <div id="exec-summary-content">
+        <div class="card">
+          <div class="card-title">Key Priorities</div>
+          <ul class="bullet-list">
+            <li><span class="bullet-dot"></span>Accenture is accelerating EU AI Act compliance work — IBM watsonx.governance renewal (Sept 2026) is a critical near-term milestone.</li>
+            <li><span class="bullet-dot"></span>Q2 2026 earnings signal a 34% increase in AI/cloud spend — Accenture has budget to expand the watsonx.ai enterprise deployment.</li>
+            <li><span class="bullet-dot"></span>New Chief AI Officer Dr. Priya Nair was appointed following the watsonx pilot — she is an IBM advocate and should be engaged immediately.</li>
+          </ul>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Recent Wins</div>
+            <ul class="bullet-list">
+              <li><span class="bullet-dot" style="background:var(--green)"></span>IBM Sterling Supply Chain award win reinforces the IBM–Accenture co-sell relationship.</li>
+              <li><span class="bullet-dot" style="background:var(--green)"></span>watsonx.ai pilot successfully completed with Accenture's FS division (Q1 2026).</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-title">Open Opportunities</div>
+            <ul class="bullet-list">
+              <li><span class="bullet-dot" style="background:var(--yellow)"></span>watsonx Enterprise Expansion — Proposal stage, est. $8.4M TCV, close target Q3 2026.</li>
+              <li><span class="bullet-dot" style="background:var(--yellow)"></span>Cloud Pak for Data capacity upgrade — est. $1.2M, driven by 88% utilisation.</li>
+              <li><span class="bullet-dot" style="background:var(--yellow)"></span>watsonx.governance renewal + upsell — $2.1M renewal + $600K add-on.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Recommended Next Steps</div>
+          <ul class="bullet-list">
+            <li><span class="bullet-dot" style="background:var(--ibm-blue)"></span>Schedule intro call with Dr. Priya Nair (new CAO) within the next 2 weeks.</li>
+            <li><span class="bullet-dot" style="background:var(--ibm-blue)"></span>Prepare watsonx.governance renewal proposal — deadline pressure from EU AI Act.</li>
+            <li><span class="bullet-dot" style="background:var(--ibm-blue)"></span>Escalate Sev 2 Cloud Pak for Data ticket (INC0042871) to demonstrate IBM support quality.</li>
+            <li><span class="bullet-dot" style="background:var(--ibm-blue)"></span>Share updated Seismic battlecard for Microsoft Azure OpenAI with the Accenture account team.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: MEETINGS ── -->
+    <div class="tab-panel" id="tab-meetings">
+      <div class="section-header">
+        <h1>Meetings &amp; Relationships — <span class="section-account"></span></h1>
+        <p>Sourced from Outlook and Microsoft Teams. In production, live via Microsoft Graph API.</p>
+      </div>
+      <div class="card-title" style="margin-bottom:12px;">Upcoming Meetings</div>
+      <div class="meeting-card">
+        <div class="meeting-header">
+          <div>
+            <div class="meeting-title">watsonx Enterprise Expansion — Proposal Review</div>
+            <div class="meeting-meta">📅 June 18, 2026 · 2:00 PM UTC · 60 min · Microsoft Teams</div>
+          </div>
+          <span class="prep-badge prep-needs">Needs Prep</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">IBM Attendees</div>
+        <div class="meeting-attendees">
+          <span class="chip ibm">Sarah Mitchell</span>
+          <span class="chip ibm">James Okonkwo</span>
+          <span class="chip ibm">Dr. Anita Rowe</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:8px;margin-bottom:4px;">Client Attendees</div>
+        <div class="meeting-attendees">
+          <span class="chip">Dr. Priya Nair (CAO)</span>
+          <span class="chip">Mark Henderson (VP Tech)</span>
+          <span class="chip">Lisa Tran (Procurement)</span>
+        </div>
+        <div class="log-note-row">
+          <input type="text" id="note-mtg_001" placeholder="Log a meeting note…" />
+          <button onclick="logNote('mtg_001')">Save Note</button>
+        </div>
+      </div>
+      <div class="meeting-card">
+        <div class="meeting-header">
+          <div>
+            <div class="meeting-title">IBM Sterling Q3 Business Review</div>
+            <div class="meeting-meta">📅 June 20, 2026 · 10:00 AM UTC · 90 min · Accenture HQ, New York</div>
+          </div>
+          <span class="prep-badge prep-complete">Prep Complete</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">IBM Attendees</div>
+        <div class="meeting-attendees">
+          <span class="chip ibm">Sarah Mitchell</span>
+          <span class="chip ibm">Chris Adeyemi</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:8px;margin-bottom:4px;">Client Attendees</div>
+        <div class="meeting-attendees">
+          <span class="chip">Rachel Park (Supply Chain)</span>
+          <span class="chip">Tom Burgess (Architect)</span>
+        </div>
+        <div class="log-note-row">
+          <input type="text" id="note-mtg_002" placeholder="Log a meeting note…" />
+          <button onclick="logNote('mtg_002')">Save Note</button>
+        </div>
+      </div>
+      <div class="meeting-card">
+        <div class="meeting-header">
+          <div>
+            <div class="meeting-title">watsonx.governance — EU AI Act Compliance Workshop</div>
+            <div class="meeting-meta">📅 June 25, 2026 · 1:00 PM UTC · 120 min · Microsoft Teams</div>
+          </div>
+          <span class="prep-badge prep-no">No Brief</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">IBM Attendees</div>
+        <div class="meeting-attendees">
+          <span class="chip ibm">Sarah Mitchell</span>
+          <span class="chip ibm">Dr. Anita Rowe</span>
+          <span class="chip ibm">IBM Legal SME (TBC)</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:8px;margin-bottom:4px;">Client Attendees</div>
+        <div class="meeting-attendees">
+          <span class="chip">Dr. Priya Nair (CAO)</span>
+          <span class="chip">Accenture Legal (TBC)</span>
+          <span class="chip">Mark Henderson</span>
+        </div>
+        <div class="log-note-row">
+          <input type="text" id="note-mtg_003" placeholder="Log a meeting note…" />
+          <button onclick="logNote('mtg_003')">Save Note</button>
+        </div>
+      </div>
+      <hr class="divider" />
+      <div class="card-title" style="margin-bottom:12px;">Meeting History (Last 5)</div>
+      <table>
+        <thead><tr><th>Date</th><th>Meeting</th><th>Key Attendees</th><th>Outcome</th></tr></thead>
+        <tbody>
+          <tr><td>Jun 4, 2026</td><td>watsonx.ai Q2 Business Review</td><td><span class="chip">Dr. Priya Nair</span></td><td class="text-muted">Pilot results positive; expansion proposal requested.</td></tr>
+          <tr><td>May 22, 2026</td><td>Cloud Pak for Data Capacity Planning</td><td><span class="chip">Tom Burgess</span></td><td class="text-muted">88% utilisation confirmed; upgrade proposal due end of June.</td></tr>
+          <tr><td>May 14, 2026</td><td>Executive Sponsor Dinner</td><td><span class="chip">Dr. Priya Nair</span><span class="chip">Accenture CEO NA</span></td><td class="text-muted">Relationship reaffirmed at exec level; IBM AI roadmap well received.</td></tr>
+          <tr><td>Apr 30, 2026</td><td>IBM Sterling Renewal Discussion</td><td><span class="chip">Rachel Park</span></td><td class="text-muted">Renewal confirmed for Nov 2026; premium tier under consideration.</td></tr>
+          <tr><td>Apr 15, 2026</td><td>watsonx.governance Scoping Call</td><td><span class="chip">Mark Henderson</span></td><td class="text-muted">EU AI Act confirmed as board-level priority; demo scheduled.</td></tr>
+        </tbody>
+      </table>
+      <hr class="divider" />
+      <div class="card-title" style="margin-bottom:12px;">Relationship Map</div>
+      <table>
+        <thead><tr><th>Contact</th><th>Title</th><th>IBM Owner</th><th>Engagement</th><th>Last Interaction</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Dr. Priya Nair</strong></td><td>Chief AI Officer</td><td>Sarah Mitchell</td><td><span class="tag tag-strong">Strong</span></td><td>Jun 4, 2026</td></tr>
+          <tr><td><strong>Mark Henderson</strong></td><td>VP Technology, FS</td><td>James Okonkwo</td><td><span class="tag tag-moderate">Moderate</span></td><td>May 14, 2026</td></tr>
+          <tr><td><strong>Rachel Park</strong></td><td>Head of Supply Chain</td><td>Chris Adeyemi</td><td><span class="tag tag-strong">Strong</span></td><td>Apr 30, 2026</td></tr>
+          <tr><td><strong>Lisa Tran</strong></td><td>Procurement Lead</td><td>Sarah Mitchell</td><td><span class="tag tag-cold">Cold</span></td><td>Feb 10, 2026</td></tr>
+          <tr><td><strong>David Osei</strong></td><td>Chief Financial Officer</td><td>Sarah Mitchell</td><td><span class="tag tag-cold">Cold</span></td><td>Nov 20, 2025</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── TAB: IBM PARTNERSHIPS ── -->
+    <div class="tab-panel" id="tab-partnerships">
+      <div class="section-header">
+        <h1>Current IBM Partnerships &amp; Relationships</h1>
+        <p>IBM co-sell relationships, strategic alliances, and joint programmes active at Accenture.</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Strategic Alliance Overview</div>
+          <table>
+            <tr><td class="text-muted">Partnership Level</td><td><span class="tag tag-blue">IBM Platinum Partner</span></td></tr>
+            <tr><td class="text-muted">Partnership Since</td><td>2004</td></tr>
+            <tr><td class="text-muted">Joint Revenue (FY25)</td><td>$420M co-sell influenced</td></tr>
+            <tr><td class="text-muted">Active Programmes</td><td>IBM ESA · IBM Build Partner · watsonx Co-sell</td></tr>
+            <tr><td class="text-muted">Alliance Manager (IBM)</td><td>Sarah Mitchell</td></tr>
+            <tr><td class="text-muted">Alliance Manager (Accenture)</td><td>Michael Obi, Global IBM Alliance Lead</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-title">Active Joint Programmes</div>
+          <ul class="bullet-list">
+            <li><span class="bullet-dot"></span><strong>IBM–Accenture watsonx Centre of Excellence</strong> — Joint delivery capability for enterprise AI at scale.</li>
+            <li><span class="bullet-dot"></span><strong>IBM Cloud Pak for Data Delivery Practice</strong> — 340 Accenture consultants IBM-certified on Cloud Pak for Data.</li>
+            <li><span class="bullet-dot"></span><strong>IBM Sterling Supply Chain CoE</strong> — Award-winning joint implementation team.</li>
+            <li><span class="bullet-dot"></span><strong>EU AI Act Compliance Accelerator</strong> — Joint GTM programme launching Q3 2026.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-title">IBM Certifications Held by Accenture Staff</div>
+        <table>
+          <thead><tr><th>Certification</th><th>Certified Staff</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>IBM watsonx.ai Technical Sales</td><td>128</td><td><span class="tag tag-advantaged">Current</span></td></tr>
+            <tr><td>IBM Cloud Pak for Data</td><td>340</td><td><span class="tag tag-advantaged">Current</span></td></tr>
+            <tr><td>IBM Sterling Supply Chain</td><td>95</td><td><span class="tag tag-advantaged">Current</span></td></tr>
+            <tr><td>IBM watsonx.governance</td><td>42</td><td><span class="tag tag-exec">Renewal Due Q3</span></td></tr>
+            <tr><td>IBM Cloud Architect</td><td>210</td><td><span class="tag tag-advantaged">Current</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── TAB: AGENT LAUNCHPAD ── -->
+    <div class="tab-panel" id="tab-launchpad">
+      <div class="section-header">
+        <h1>AI Agent Launchpad</h1>
+        <p>Pre-built IBM Sales AI Agents — click any card to run the agent for Accenture.</p>
+      </div>
+      <div class="grid-3">
+        <div class="agent-card" onclick="runAgent('leads')">
+          <div class="agent-icon">🎯</div>
+          <h3>Lead Identification</h3>
+          <p>Identify and score the top leads within Accenture based on title, department, and deal relevance.</p>
+          <div class="agent-result" id="result-leads">
+            <table><thead><tr><th>Contact</th><th>Title</th><th>Score</th></tr></thead><tbody>
+              <tr><td>Dr. Priya Nair</td><td>Chief AI Officer</td><td><span class="text-green">96</span></td></tr>
+              <tr><td>Mark Henderson</td><td>VP Technology, FS</td><td><span class="text-green">84</span></td></tr>
+              <tr><td>Lisa Tran</td><td>Procurement Lead</td><td><span class="text-yellow">72</span></td></tr>
+              <tr><td>David Osei</td><td>CFO</td><td><span class="text-yellow">68</span></td></tr>
+              <tr><td>Sophie Andersen</td><td>Head of Data &amp; Analytics</td><td><span class="text-yellow">61</span></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+        <div class="agent-card" onclick="runAgent('outreach')">
+          <div class="agent-icon">✉️</div>
+          <h3>Client Outreach Draft</h3>
+          <p>Generate a personalised outreach email for Dr. Priya Nair about watsonx.governance and EU AI Act compliance.</p>
+          <div class="agent-result" id="result-outreach">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;"><strong>To:</strong> Dr. Priya Nair &lt;priya.nair@accenture.com&gt;<br><strong>Subject:</strong> Continuing Our Conversation — IBM watsonx &amp; EU AI Act Compliance</div>
+            <div style="font-size:13px;line-height:1.6;">Dear Dr. Nair,<br><br>I hope this note finds you well. Following our recent discussions, I wanted to reach out personally regarding new IBM watsonx capabilities directly relevant to your EU AI Act compliance timeline.<br><br>IBM watsonx.governance now includes dedicated tools for model explainability, audit trails, and bias detection — built specifically for regulated industries ahead of the Q3 enforcement deadline.<br><br>Would you be available for a 30-minute call the week of June 23rd?<br><br>Warm regards,<br>Sarah Mitchell · IBM GAE</div>
+            <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">⚡ Powered by IBM Client Outreach AI Agent (Salesforce + Seismic)</div>
+          </div>
+        </div>
+        <div class="agent-card" onclick="runAgent('search')">
+          <div class="agent-icon">🔍</div>
+          <h3>Client Search (D&amp;B)</h3>
+          <p>Retrieve enriched firmographic, technographic, and key contact data from Dun &amp; Bradstreet.</p>
+          <div class="agent-result" id="result-search">
+            <table>
+              <tr><td class="text-muted">Revenue</td><td>$64.9B (FY2025)</td></tr>
+              <tr><td class="text-muted">Ticker</td><td>ACN (NYSE) · Credit: AA</td></tr>
+              <tr><td class="text-muted">Cloud</td><td>Azure · AWS · GCP · IBM Cloud</td></tr>
+              <tr><td class="text-muted">AI Platforms</td><td>IBM watsonx · Azure OpenAI · Vertex AI</td></tr>
+              <tr><td class="text-muted">CRM / ERP</td><td>Salesforce · SAP S/4HANA</td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="agent-card" onclick="runAgent('crm')">
+          <div class="agent-icon">📊</div>
+          <h3>CRM Snapshot</h3>
+          <p>Pull the latest Salesforce opportunity pipeline, stages, and forecast for Accenture.</p>
+          <div class="agent-result" id="result-crm">
+            <table><thead><tr><th>Opportunity</th><th>Stage</th><th>Amount</th><th>Close</th></tr></thead><tbody>
+              <tr><td>watsonx Enterprise Expansion</td><td><span class="tag tag-blue">Proposal</span></td><td>$8.4M</td><td>Sep 30</td></tr>
+              <tr><td>Cloud Pak for Data Upgrade</td><td><span class="tag tag-moderate">Needs Analysis</span></td><td>$1.2M</td><td>Aug 15</td></tr>
+              <tr><td>watsonx.governance Renewal</td><td><span class="tag tag-advantaged">Value Prop</span></td><td>$2.7M</td><td>Aug 31</td></tr>
+            </tbody></table>
+            <div style="margin-top:10px;font-size:13px;font-weight:600;">Total Pipeline: <span class="text-green">$12.3M</span></div>
+          </div>
+        </div>
+        <div class="agent-card" onclick="runAgent('updatecrm')">
+          <div class="agent-icon">✏️</div>
+          <h3>Update CRM Record</h3>
+          <p>Update a Salesforce opportunity field directly from the dashboard — stage, forecast, close date.</p>
+          <div class="agent-result" id="result-updatecrm">
+            <div class="crm-form">
+              <div>
+                <label>Opportunity</label>
+                <select id="crm-record-id">
+                  <option value="SF-OPP-20240801">watsonx Enterprise Expansion</option>
+                  <option value="SF-OPP-20240802">Cloud Pak for Data Upgrade</option>
+                  <option value="SF-OPP-20240803">watsonx.governance Renewal</option>
+                </select>
+              </div>
+              <div>
+                <label>Field</label>
+                <select id="crm-field">
+                  <option value="Stage">Stage</option>
+                  <option value="Forecast_Category">Forecast Category</option>
+                  <option value="Close_Date">Close Date</option>
+                </select>
+              </div>
+              <div>
+                <label>New Value</label>
+                <input type="text" id="crm-value" placeholder="e.g. Proposal, Commit, 2026-09-30" />
+              </div>
+              <button class="crm-submit" onclick="submitCrmUpdate()">Update Salesforce Record</button>
+            </div>
+          </div>
+        </div>
+        <div class="agent-card" onclick="runAgent('seismic')">
+          <div class="agent-icon">📚</div>
+          <h3>Seismic Content</h3>
+          <p>Find the most relevant Seismic sales content for IBM watsonx and EU AI Act compliance topics.</p>
+          <div class="agent-result" id="result-seismic">
+            <ul class="bullet-list">
+              <li><span class="bullet-dot"></span><div><strong>watsonx Enterprise Value Prop Deck 2026</strong><br><span class="text-muted" style="font-size:12px;">Sales Presentation · Relevance: 97%</span></div></li>
+              <li><span class="bullet-dot"></span><div><strong>IBM vs Microsoft Competitive Battlecard</strong><br><span class="text-muted" style="font-size:12px;">Battlecard · Relevance: 93%</span></div></li>
+              <li><span class="bullet-dot"></span><div><strong>Accenture watsonx Success Story</strong><br><span class="text-muted" style="font-size:12px;">Case Study · Relevance: 89%</span></div></li>
+            </ul>
+          </div>
+        </div>
+        <div class="agent-card" onclick="runAgent('research')">
+          <div class="agent-icon">🧠</div>
+          <h3>Sales Research Brief</h3>
+          <p>Generate a consolidated account research brief combining D&amp;B, news signals, and IBM internal data.</p>
+          <div class="agent-result" id="result-research">
+            <div style="font-size:13px;line-height:1.6;margin-bottom:10px;">Accenture is a $64.9B global technology consulting leader. IBM is one of their top 3 enterprise AI partners with active watsonx, Cloud Pak for Data, and Sterling deployments.</div>
+            <div class="card-title">Top Signals</div>
+            <ul class="bullet-list">
+              <li><span class="bullet-dot"></span>New CAO appointment — strong IBM watsonx advocate.</li>
+              <li><span class="bullet-dot"></span>EU AI Act urgency — watsonx.governance renewal is critical path.</li>
+              <li><span class="bullet-dot"></span>AWS $3B partnership — competitive pressure on IBM Cloud.</li>
+              <li><span class="bullet-dot"></span>Q2 AI/cloud budget +34% YoY — capital available for IBM expansion.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: CHATBOT ── -->
+    <div class="tab-panel" id="tab-chatbot">
+      <div class="section-header">
+        <h1>Ask Bob — AI Chatbot</h1>
+        <p>Powered by IBM watsonx Orchestrate · sales_hub_orchestrator_agent · Click any question to fire it into Bob</p>
+      </div>
+      <div class="card" style="padding:24px;text-align:center;color:var(--text-muted);">
+        <div style="font-size:32px;margin-bottom:12px;">💬</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px;">Bob is ready</div>
+        <div style="font-size:13px;">Bob is embedded in the bottom-right of every tab. Click any question below or type your own.</div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-title">Sample Questions — click to ask Bob directly</div>
+        <ul class="bullet-list" id="sample-questions-list">
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">What's new with Accenture this week?</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">Do I have any meetings with Accenture this month?</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">Who are IBM's biggest competitors at Accenture right now?</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">Draft an outreach email to Dr. Priya Nair about watsonx.governance.</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">What IBM products does Accenture currently have active?</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">Give me a quick exec summary before my call with Accenture today.</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">What deals do we have open in Salesforce for Accenture?</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">Find me the latest Seismic content on IBM Cloud Pak for Data.</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">What is our win/loss record at Accenture over the last year?</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">Flag the news item about Accenture's AWS partnership as important.</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">Log a meeting note: discussed watsonx renewal timeline, decision by end of Q3.</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">What's the relationship status with the CFO at Accenture?</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">Give me a competitive battlecard against Microsoft at Accenture.</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">Update the Salesforce opportunity stage to Proposal for the watsonx deal.</a></li>
+          <li><span class="bullet-dot"></span><a class="sample-q" onclick="askBobSample(this)">What leads have been identified at Accenture?</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /.main -->
+</div><!-- /#app -->
+
+<!-- ═══════════════════ BATTLECARD MODAL ═══════════════════ -->
+<div class="modal-overlay" id="battlecard-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">Battlecard — Microsoft</h2>
+      <button class="modal-close" onclick="closeBattlecard()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ CHAT FAB + PANEL ═══════════════════ -->
+<button class="chat-fab" onclick="toggleChat()" id="chat-fab">💬 Ask Bob</button>
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-header">
+    <div>
+      <h3>Ask Bob</h3>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">sales_hub_orchestrator_agent</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:11px;color:var(--green);">● Live</span>
+      <button class="chat-close" onclick="toggleChat()">✕</button>
+    </div>
+  </div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-suggestions">
+    <button class="chat-suggest-btn" onclick="sendSuggestion(this)">Exec summary for today</button>
+    <button class="chat-suggest-btn" onclick="sendSuggestion(this)">Competitor risks?</button>
+    <button class="chat-suggest-btn" onclick="sendSuggestion(this)">Upcoming meetings</button>
+    <button class="chat-suggest-btn" onclick="sendSuggestion(this)">Salesforce pipeline</button>
+  </div>
+  <div class="chat-input-row">
+    <input type="text" id="chat-input" placeholder="Ask Bob anything about Accenture…" onkeydown="if(event.key==='Enter')sendChat()" />
+    <button class="chat-send" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+  // ─────────────────────────────────────────────
+  // STATE
+  // ─────────────────────────────────────────────
+  let currentRep = 'Sarah Mitchell';
+  let currentAccount = 'Accenture';
+
+  // ─────────────────────────────────────────────
+  // LAUNCH & ACCOUNT WIRING
+  // ─────────────────────────────────────────────
+  function launchDashboard() {
+    currentRep = document.getElementById('rep-name').value.trim() || 'Sarah Mitchell';
+    currentAccount = document.getElementById('account-select').value;
+    document.getElementById('topbar-account').textContent = currentAccount;
+    document.getElementById('topbar-rep').textContent = currentRep;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    document.getElementById('chat-fab').classList.add('visible');
+    // Stamp all section-account spans
+    document.querySelectorAll('.section-account').forEach(el => el.textContent = currentAccount);
+    // Stamp exec summary metadata
+    document.getElementById('exec-rep-name').textContent = currentRep;
+    const now = new Date();
+    document.getElementById('exec-date').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    // Seed Bob's greeting with the rep name
+    appendMessage(
+      'Good morning, ' + currentRep.split(' ')[0] + '. I\'m Bob, your IBM Sales Intelligence assistant — ' +
+      'routing through the sales_hub_orchestrator_agent. I\'m loaded with everything on ' + currentAccount +
+      ': news, meetings, pipeline, competitive intel, and more. What do you need today?',
+      'bob'
+    );
+  }
+
+  // ─────────────────────────────────────────────
+  // TABS
+  // ─────────────────────────────────────────────
+  function showTab(id) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  // ─────────────────────────────────────────────
+  // TOAST SYSTEM
+  // ─────────────────────────────────────────────
+  function showToast(msg, type) {
+    const container = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = 'toast' + (type ? ' toast-' + type : '');
+    t.textContent = msg;
+    container.appendChild(t);
+    requestAnimationFrame(() => { requestAnimationFrame(() => t.classList.add('show')); });
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => t.remove(), 220);
+    }, 3200);
+  }
+
+  // ─────────────────────────────────────────────
+  // NEWS FLAGS
+  // ─────────────────────────────────────────────
+  function flagNews(id, type, btn) {
+    const item = document.getElementById('ni-' + id);
+    item.classList.remove('flagged-important', 'flagged-dismissed');
+    item.querySelectorAll('.btn-sm').forEach(b => { b.classList.remove('active'); });
+    if (type === 'Important')       { item.classList.add('flagged-important');  btn.classList.add('active'); }
+    if (type === 'Dismiss')         { item.classList.add('flagged-dismissed');  btn.classList.add('active'); }
+    if (type === 'Share with Team') { btn.classList.add('active'); btn.textContent = '✓ Shared'; }
+    showToast('News item ' + id + ' flagged as "' + type + '" — saved to Morning News feed.', 'success');
+  }
+
+  // ─────────────────────────────────────────────
+  // EXEC SUMMARY COPY
+  // ─────────────────────────────────────────────
+  function copyExecSummary() {
+    const el = document.getElementById('exec-summary-content');
+    navigator.clipboard.writeText(el.innerText).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✓ Copied!';
+      showToast('Executive summary copied to clipboard.', 'success');
+      setTimeout(() => btn.textContent = '⎘ Copy to Clipboard', 2000);
+    });
+  }
+
+  // ─────────────────────────────────────────────
+  // LOG MEETING NOTE
+  // ─────────────────────────────────────────────
+  function logNote(meetingId) {
+    const input = document.getElementById('note-' + meetingId);
+    const note = input.value.trim();
+    if (!note) { showToast('Please enter a note before saving.', 'warn'); return; }
+    input.value = '';
+    const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    showToast('Note saved to Salesforce CRM for meeting ' + meetingId + ' — logged by ' + currentRep + ' on ' + today + '.', 'success');
+  }
+
+  // ─────────────────────────────────────────────
+  // AGENT LAUNCHPAD
+  // ─────────────────────────────────────────────
+  function runAgent(id) {
+    const result = document.getElementById('result-' + id);
+    const wasOpen = result.classList.contains('visible');
+    document.querySelectorAll('.agent-result').forEach(r => r.classList.remove('visible'));
+    if (!wasOpen) result.classList.add('visible');
+  }
+
+  // ─────────────────────────────────────────────
+  // UPDATE CRM RECORD (launchpad card action)
+  // ─────────────────────────────────────────────
+  function submitCrmUpdate() {
+    const recordId = document.getElementById('crm-record-id').value;
+    const field    = document.getElementById('crm-field').value;
+    const value    = document.getElementById('crm-value').value.trim();
+    if (!value) { showToast('Please enter a new value before updating.', 'warn'); return; }
+    const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    showToast('Salesforce updated — ' + recordId + ' · ' + field + ' → "' + value + '" · ' + today + ' · ' + currentRep, 'success');
+    document.getElementById('crm-value').value = '';
+  }
+
+  // ─────────────────────────────────────────────
+  // BATTLECARD MODAL
+  // ─────────────────────────────────────────────
+  const battlecards = {
+    'Microsoft': {
+      differentiators: [
+        'IBM watsonx.governance provides enterprise-grade explainability, bias detection, and full EU AI Act audit trails — Azure OpenAI has no comparable governance layer.',
+        'IBM watsonx runs on open-source LLMs (Hugging Face, Llama), avoiding proprietary GPT lock-in and enabling hybrid/on-prem deployment.',
+        'IBM has 30+ years of regulated-industry AI expertise; Microsoft\'s enterprise AI capabilities date from 2023 with limited FS track record.',
+        'IBM Cloud Pak for Data provides hybrid multi-cloud data fabric that Azure Synapse cannot replicate in sovereign/on-prem environments.',
+      ],
+      weaknesses: [
+        'Azure OpenAI lacks transparent model lineage, explainability reports, and EU AI Act audit trail capabilities.',
+        'Heavy lock-in: Microsoft\'s AI stack is tied to Azure + M365 + Teams — vendor concentration risk.',
+        'Limited hybrid/on-prem options for regulated financial services workloads.',
+        'Microsoft Copilot for M365 is not a substitute for IBM\'s domain-specific fine-tuning in watsonx.ai.',
+      ],
+      talking_points: [
+        '"How will Accenture demonstrate EU AI Act model explainability to regulators using Azure OpenAI?" — IBM watsonx.governance is the only answer with a Q3 deadline.',
+        'IBM watsonx already has a proven, award-acknowledged deployment at Accenture FS. Azure OpenAI is unproven at Accenture scale.',
+        'Position IBM as the only vendor with a complete governed AI stack: data (Cloud Pak) + AI (watsonx.ai) + compliance (watsonx.governance).',
+      ],
+      products: ['IBM watsonx.ai', 'IBM watsonx.governance', 'IBM Cloud Pak for Data'],
+    },
+    'AWS': {
+      differentiators: [
+        'IBM Sterling has 20+ years of supply chain depth and thousands of pre-built connectors — AWS Supply Chain launched in 2022 and has a fraction of Sterling\'s enterprise track record.',
+        'IBM\'s hybrid cloud supports on-prem, private cloud, and true multi-cloud. AWS is inherently AWS-centric.',
+        'IBM is Accenture\'s long-term co-sell partner; AWS now directly competes with Accenture in consulting — an internal tension IBM can leverage.',
+        'IBM watsonx.governance provides responsible AI and EU AI Act compliance that Amazon Bedrock does not offer.',
+      ],
+      weaknesses: [
+        'AWS Supply Chain is nascent — limited EDI integration, supplier onboarding, and order management vs IBM Sterling.',
+        'The $3B Accenture–AWS deal creates internal conflict: Accenture consulting staff selling AWS compete with Accenture\'s own services revenue.',
+        'Amazon Bedrock has no enterprise AI governance layer — no explainability, no audit trails for regulated deployments.',
+        'AWS enterprise support and professional services depth is weaker than IBM\'s co-delivery model with Accenture.',
+      ],
+      talking_points: [
+        'Accenture signed an AWS partnership, but IBM remains their proven AI and supply chain platform — the watsonx investment is already live.',
+        'Position the AWS deal as a consulting channel play, not a technology replacement. Accenture needs IBM\'s stack regardless of cloud migration.',
+        '"Where does Amazon Bedrock\'s EU AI Act governance story leave Accenture\'s FS division?" — then position IBM watsonx.governance.',
+      ],
+      products: ['IBM Sterling Supply Chain Suite', 'IBM watsonx.ai', 'IBM watsonx.governance', 'IBM Cloud Pak for Data'],
+    },
+    'Google Cloud': {
+      differentiators: [
+        'IBM Cloud Pak for Data provides a governed data fabric with deep hybrid and on-prem support — Vertex AI and BigQuery ML are cloud-native only.',
+        'IBM watsonx.governance addresses EU AI Act compliance with model cards, bias detection, and audit trails — Vertex AI has no equivalent.',
+        'IBM has 20+ years of Financial Services AI expertise, FedRAMP/ISO certifications, and dedicated FS solution teams. Google\'s FS practice is newer.',
+        'IBM\'s Accenture co-delivery relationship has hundreds of certified consultants. Google Cloud\'s Accenture partnership is thinner.',
+      ],
+      weaknesses: [
+        'Google Vertex AI requires significant MLOps expertise and custom integration to reach legacy enterprise data sources.',
+        'Google Cloud enterprise support consistently receives criticism at large accounts — IBM\'s dedicated account team is materially stronger.',
+        'Gemini Enterprise integration with SAP, mainframe, and IBM Sterling is immature.',
+        'Google Cloud has limited on-prem and private cloud options for Accenture\'s regulated FS client workloads.',
+      ],
+      talking_points: [
+        'Position IBM\'s Financial Services regulatory certifications vs Google\'s consumer-origin, cloud-first approach.',
+        '"How does Vertex AI handle EU AI Act requirements for Accenture\'s FS division?" — IBM watsonx.governance has the answer today.',
+        'Highlight IBM Cloud Pak for Data\'s hybrid deployment vs BigQuery ML\'s GCP-only architecture for regulated workloads.',
+      ],
+      products: ['IBM Cloud Pak for Data', 'IBM watsonx.ai', 'IBM watsonx.governance'],
+    },
+    'Salesforce': {
+      differentiators: [
+        'IBM watsonx operates across the entire enterprise data estate — structured, unstructured, streaming — not just CRM data.',
+        'IBM Cloud Pak for Data provides enterprise-grade integration, lineage, and governance across multi-cloud and on-prem. Salesforce Data Cloud is limited to customer/marketing data.',
+        'IBM watsonx.governance addresses EU AI Act compliance with model explainability and audit trails — Salesforce has no equivalent product.',
+        'IBM\'s Accenture co-sell track record and certified consultant base is materially deeper than Salesforce\'s Accenture partnership.',
+      ],
+      weaknesses: [
+        'Salesforce Einstein AI is coupled to Salesforce CRM — it cannot access Accenture\'s supply chain, finance, or operational data.',
+        'Agentforce is recently launched with limited enterprise production deployments and no proven Accenture-scale track record.',
+        'Salesforce Data Cloud focuses on customer/marketing data — cannot replace IBM Cloud Pak for Data\'s analytics breadth.',
+        'High TCO for AI capabilities outside the Salesforce ecosystem; limited hybrid/on-prem deployment.',
+      ],
+      talking_points: [
+        'Position IBM + Salesforce as complementary: "IBM powers the enterprise AI and data fabric; Salesforce powers the CRM." No binary choice needed.',
+        '"For AI use cases outside CRM — supply chain, risk, compliance, analytics — where does Salesforce\'s story end?" IBM watsonx is the answer.',
+        'Accenture is already a Salesforce partner — IBM can co-exist and extend Salesforce data with watsonx without displacement.',
+      ],
+      products: ['IBM watsonx.ai', 'IBM Cloud Pak for Data', 'IBM watsonx.governance'],
+    },
+  };
+
+  function openBattlecard(competitor) {
+    const card = battlecards[competitor] || battlecards['Microsoft'];
+    document.getElementById('modal-title').textContent = 'Battlecard — IBM vs ' + competitor;
+    let html = '';
+    const sections = [
+      ['IBM Differentiators', card.differentiators],
+      ['Competitor Weaknesses', card.weaknesses],
+      ['Suggested Talking Points', card.talking_points],
+    ];
+    sections.forEach(([title, items]) => {
+      html += '<div class="modal-section"><h4>' + title + '</h4><ul>';
+      items.forEach(i => html += '<li>' + i + '</li>');
+      html += '</ul></div>';
+    });
+    html += '<div class="modal-section"><h4>IBM Products to Position</h4><div class="pill-row">';
+    card.products.forEach(p => html += '<span class="tag tag-blue">' + p + '</span>');
+    html += '</div></div>';
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('battlecard-modal').classList.add('open');
+  }
+
+  function closeBattlecard() {
+    document.getElementById('battlecard-modal').classList.remove('open');
+  }
+
+  // ─────────────────────────────────────────────
+  // BOB CHATBOT ENGINE
+  // All 15 spec questions + action side-effects
+  // ─────────────────────────────────────────────
+
+  // Routing map: [test function, response generator]
+  const BOB_ROUTES = [
+
+    // 1. Morning news / what's new
+    [m => /what'?s new|news|press release|announcement|this week/i.test(m),
+     () => `Here's today's Morning News for ${currentAccount} — I'm routing through morning_news_agent:\n\n` +
+           '🔴 <b>Competitor Move</b> — Accenture expands AWS partnership with $3B cloud migration commitment (Reuters, Jun 10)\n' +
+           '🟡 <b>Executive Change</b> — Dr. Priya Nair appointed Chief AI Officer following watsonx pilot success (Bloomberg, Jun 8)\n' +
+           '🟢 <b>Opportunity</b> — Q2 2026 earnings: AI &amp; cloud revenue up 34% YoY — budget available (WSJ, Jun 5)\n' +
+           '🟢 <b>Opportunity</b> — EU AI Act deadline creates urgency for watsonx.governance renewal (FT, Jun 3)\n' +
+           '🔴 <b>Risk</b> — Accenture piloting Azure OpenAI for internal automation (TechCrunch, May 29)\n\n' +
+           'Want me to flag the AWS news as important, or pull a competitive battlecard?'],
+
+    // 2. Meetings / calendar
+    [m => /meeting|calendar|upcoming|scheduled|this month/i.test(m),
+     () => `Routing to meetings_relationships_agent — here are your upcoming meetings with ${currentAccount}:\n\n` +
+           '📅 <b>Jun 18</b> — watsonx Enterprise Expansion Proposal Review · 2:00 PM UTC · <span style="color:var(--yellow)">Needs Prep</span>\n' +
+           '📅 <b>Jun 20</b> — IBM Sterling Q3 Business Review · 10:00 AM UTC · <span style="color:var(--green)">Prep Complete</span>\n' +
+           '📅 <b>Jun 25</b> — watsonx.governance EU AI Act Compliance Workshop · 1:00 PM UTC · <span style="color:var(--red)">No Brief</span>\n\n' +
+           '⚠️ 2 meetings still need prep. Shall I help draft a brief for the June 18th proposal review?'],
+
+    // 3. Competitors / who are competitors
+    [m => /competitor|competition|who.*(compet|evaluat|vs|versus)|competitive landscape|biggest.*risk/i.test(m),
+     () => `Routing to competitor_analysis_agent — active competitors at ${currentAccount}:\n\n` +
+           '⚠️ <b>AWS</b> (At Risk, $7.8M) — $3B Accenture partnership announced. AWS Supply Chain vs IBM Sterling.\n' +
+           '⚠️ <b>Microsoft</b> (At Risk, $5.2M) — Azure OpenAI PoC targeting 15,000 Accenture employees.\n' +
+           '🟡 <b>Google Cloud</b> (Even, $3.1M) — Vertex AI evaluated for analytics modernisation.\n' +
+           '✅ <b>Salesforce</b> (Advantaged, $1.4M) — CRM AI only; IBM well positioned.\n\n' +
+           'Click "View Battlecard" on the Competitor Analysis tab, or ask me: "Give me a battlecard against Microsoft."'],
+
+    // 4. Battlecard for a specific competitor
+    [m => /battlecard|talking point|differentiator|position.*ibm|ibm.*position/i.test(m),
+     () => {
+       const comp = /microsoft/i.test(m) ? 'Microsoft' : /aws|amazon/i.test(m) ? 'AWS' : /google/i.test(m) ? 'Google Cloud' : /salesforce/i.test(m) ? 'Salesforce' : 'Microsoft';
+       setTimeout(() => openBattlecard(comp), 300);
+       return `Opening the IBM vs ${comp} battlecard — routing to competitor_analysis_agent.<br><br>` +
+              'Key IBM differentiator for this account: watsonx.governance is the only platform that directly addresses the EU AI Act compliance deadline Accenture faces in Q3 2026.';
+     }],
+
+    // 5. IBM products / active licenses / ISC Cloud
+    [m => /ibm product|active product|license|isccloud|isc cloud|what.*product|renewal|sterling|watsonx.ai|cloud pak/i.test(m),
+     () => `Routing to account_intelligence_agent → get_isc_cloud_data for ${currentAccount}:\n\n` +
+           '✅ <b>IBM watsonx.ai</b> — Enterprise · 2,500 seats · 74% usage · Renews Dec 31, 2026\n' +
+           '⚠️ <b>IBM watsonx.governance</b> — Professional · 800 seats · 61% usage · <b>Renews Sep 30, 2026</b> (90-day alert)\n' +
+           '🔺 <b>IBM Cloud Pak for Data</b> — Enterprise · 1,200 seats · <b>88% usage</b> (upsell candidate)\n' +
+           '🔺 <b>IBM Sterling Supply Chain Suite</b> — Enterprise · 450 seats · <b>93% usage</b> (premium tier candidate)\n\n' +
+           '⚠️ Open tickets: INC0042871 (Sev 2 — Cloud Pak DataStage latency), INC0044102 (Sev 3 — watsonx.ai rate limits)'],
+
+    // 6. Exec summary / call prep / brief
+    [m => /exec.*summary|summary.*exec|call prep|prep.*call|quick.*summary|before.*call|brief/i.test(m),
+     () => `Routing to account_intelligence_agent → get_executive_summary for ${currentAccount}:\n\n` +
+           '<b>Key Priorities</b>\n• EU AI Act compliance — watsonx.governance renewal (Sep 30) is critical path.\n• 34% AI/cloud budget growth — Accenture has capital to expand watsonx enterprise deployment.\n• New CAO Dr. Priya Nair (IBM advocate) — engage within 2 weeks.\n\n' +
+           '<b>Open Opportunities</b>\n• watsonx Enterprise Expansion — $8.4M TCV · Proposal · Q3 close\n• Cloud Pak for Data upgrade — $1.2M · 88% utilisation signal\n• watsonx.governance renewal + upsell — $2.7M\n\n' +
+           '<b>Next Steps</b>\n• Schedule intro call with Dr. Priya Nair.\n• Prepare watsonx.governance renewal proposal.\n• Escalate Sev 2 ticket INC0042871 before proposal meeting.'],
+
+    // 7. Salesforce / CRM / pipeline / deals
+    [m => /salesforce|pipeline|crm|deal|opportunit|forecast|open.*deal/i.test(m),
+     () => `Routing to ai_agent_launchpad_agent → get_crm_snapshot for ${currentAccount}:\n\n` +
+           '💰 <b>watsonx Enterprise Expansion</b> — $8,400,000 · Proposal · Close: Sep 30, 2026 · Best Case\n' +
+           '💰 <b>Cloud Pak for Data Upgrade</b> — $1,200,000 · Needs Analysis · Close: Aug 15, 2026 · Pipeline\n' +
+           '💰 <b>watsonx.governance Renewal + Upsell</b> — $2,700,000 · Value Proposition · Close: Aug 31, 2026 · Commit\n\n' +
+           '<b>Total open pipeline: <span style="color:var(--green)">$12,300,000</span></b>\n\nWant me to update a stage or forecast category?'],
+
+    // 8. Seismic / enablement content
+    [m => /seismic|enablement|content|sales.*content|presentation|battlecard.*content/i.test(m),
+     () => `Routing to ai_agent_launchpad_agent → get_enablement_content — top Seismic recommendations:\n\n` +
+           '📄 <b>IBM watsonx.governance — EU AI Act Compliance Solution Brief</b> · Solution Brief · Relevance: 99%\n' +
+           '📄 <b>IBM watsonx vs Microsoft Azure OpenAI — Competitive Battlecard</b> · Battlecard · Relevance: 95%\n' +
+           '📄 <b>Accenture × IBM watsonx Financial Services AI Success Story</b> · Case Study · Relevance: 91%\n\n' +
+           'All content available at ibm.seismic.com. Want me to search for a different topic?'],
+
+    // 9. Win/loss record
+    [m => /win.*loss|loss.*win|win.*record|lost.*deal|recent.*win|competitive.*history/i.test(m),
+     () => `Routing to competitor_analysis_agent → get_win_loss_summary for ${currentAccount} (June 2025–2026):\n\n` +
+           '✅ <b>Wins (3):</b>\n• IBM Sterling Renewal &amp; Expansion — $4.1M · Feb 2026 · Beat AWS Supply Chain cost pitch\n• watsonx.ai FS Pilot → Production — $3.2M · Nov 2025 · Beat Google Vertex AI; drove Priya Nair\'s CAO appointment\n• Cloud Pak for Data Expansion — $1.8M · Aug 2025 · Utilisation-driven, no competitive alternative\n\n' +
+           '❌ <b>Losses (2):</b>\n• Internal Automation Platform — $2.4M · Jan 2026 · Lost to Microsoft M365 bundled pricing\n• HR Analytics — $900K · Sep 2025 · Lost to Workday native HR AI\n\n' +
+           'Win rate: <b>60%</b>. Key lesson: engage procurement (Lisa Tran) early — she was absent in the Jan 2026 loss.'],
+
+    // 10. Flag news item
+    [m => /flag.*news|flag.*item|flag.*aws|flag.*partnership|mark.*important/i.test(m),
+     () => {
+       const id = 'news_001';
+       const item = document.getElementById('ni-' + id);
+       if (item) {
+         item.classList.remove('flagged-dismissed');
+         item.classList.add('flagged-important');
+         const btn = item.querySelector('.btn-sm');
+         if (btn) btn.classList.add('active');
+         showToast('News item "Accenture AWS $3B Partnership" flagged as Important — Morning News feed updated.', 'success');
+       }
+       return `Done — I've flagged the Accenture AWS partnership news item (news_001) as "<b>Important</b>" in your Morning News feed.\n\nRouted to morning_news_agent → flag_news_item. The item is now highlighted in yellow on the Morning News tab.`;
+     }],
+
+    // 11. Log meeting note
+    [m => /log.*note|save.*note|meeting note|note.*meeting|discussed.*watsonx|record.*note/i.test(m),
+     () => {
+       const note = m.replace(/log.*note[:\s]*/i, '').replace(/save.*note[:\s]*/i, '').trim() ||
+                    'discussed watsonx renewal timeline, decision expected by end of Q3';
+       const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+       showToast('Meeting note saved to Salesforce CRM — mtg_001 · ' + today + ' · ' + currentRep, 'success');
+       return `Routing to meetings_relationships_agent → log_meeting_note:\n\n` +
+              '<b>Meeting ID:</b> mtg_001 (watsonx Enterprise Expansion — Proposal Review)\n' +
+              '<b>Note:</b> "' + note + '"\n' +
+              '<b>Logged by:</b> ' + currentRep + '\n' +
+              '<b>Date:</b> ' + today + '\n\n' +
+              'Saved to Salesforce CRM. You can also log notes directly on the Meetings tab.';
+     }],
+
+    // 12. Relationship status / CFO / contact
+    [m => /relationship|cfo|contact|engagement.*level|who.*know|status.*with|cold.*contact/i.test(m),
+     () => `Routing to meetings_relationships_agent → get_relationship_map for ${currentAccount}:\n\n` +
+           '✅ <b>Dr. Priya Nair</b> (Chief AI Officer) — <span style="color:var(--green)">Strong</span> · Last: Jun 4, 2026 · IBM advocate, direct budget authority\n' +
+           '🟡 <b>Mark Henderson</b> (VP Technology, FS) — <span style="color:var(--yellow)">Moderate</span> · Last: May 14, 2026 · Budget holder for watsonx.governance\n' +
+           '✅ <b>Rachel Park</b> (Head of Supply Chain) — <span style="color:var(--green)">Strong</span> · Last: Apr 30, 2026 · Sterling renewal sponsor\n' +
+           '🔴 <b>Lisa Tran</b> (Procurement Lead) — <span style="color:var(--red)">Cold</span> · Last: Feb 10, 2026 · ⚠️ Procurement gatekeeper — re-engage before proposal\n' +
+           '🔴 <b>David Osei</b> (CFO) — <span style="color:var(--red)">Cold</span> · Last: Nov 20, 2025 · ⚠️ Final $8.4M budget sign-off — IBM exec outreach needed'],
+
+    // 13. Update Salesforce / CRM record
+    [m => /update.*salesforce|update.*crm|update.*opportunit|change.*stage|set.*stage|proposal.*stage|stage.*proposal/i.test(m),
+     () => {
+       const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+       showToast('Salesforce updated — SF-OPP-20240801 · Stage → "Proposal" · ' + today + ' · ' + currentRep, 'success');
+       return `Routing to ai_agent_launchpad_agent → update_crm_record:\n\n` +
+              '<b>Record ID:</b> SF-OPP-20240801 (watsonx Enterprise Expansion)\n' +
+              '<b>Field updated:</b> Stage\n' +
+              '<b>New value:</b> Proposal\n' +
+              '<b>Updated by:</b> ' + currentRep + '\n' +
+              '<b>Date:</b> ' + today + '\n\n' +
+              'Salesforce CRM updated. You can also use the Update CRM card on the AI Agent Launchpad tab for other records and fields.';
+     }],
+
+    // 14. Leads
+    [m => /lead|identify.*lead|lead.*identif|who.*contact|top.*contact|prospect/i.test(m),
+     () => `Routing to ai_agent_launchpad_agent → run_lead_identification for ${currentAccount}:\n\n` +
+           '🎯 <b>Dr. Priya Nair</b> (CAO) — Score: <span style="color:var(--green)">96</span> · IBM advocate, direct budget authority\n' +
+           '🎯 <b>Mark Henderson</b> (VP Technology, FS) — Score: <span style="color:var(--green)">84</span> · watsonx.governance budget holder\n' +
+           '🟡 <b>Lisa Tran</b> (Procurement Lead) — Score: <span style="color:var(--yellow)">72</span> · Procurement gatekeeper for deals >$1M\n' +
+           '🟡 <b>David Osei</b> (CFO) — Score: <span style="color:var(--yellow)">68</span> · Final approval for deals >$5M\n' +
+           '🟡 <b>Sophie Andersen</b> (Head of Data &amp; Analytics) — Score: <span style="color:var(--yellow)">61</span> · Cloud Pak upsell sponsor\n\n' +
+           'Want me to draft an outreach email for any of these contacts?'],
+
+    // 15. Draft outreach email
+    [m => /draft.*email|outreach.*email|email.*draft|write.*email|compose.*email/i.test(m),
+     () => {
+       const contact = /priya|nair|cao/i.test(m) ? 'Dr. Priya Nair' : /henderson|mark/i.test(m) ? 'Mark Henderson' : /osei|cfo/i.test(m) ? 'David Osei' : 'Dr. Priya Nair';
+       return `Routing to ai_agent_launchpad_agent → run_client_outreach_draft for ${contact}:\n\n` +
+              '<b>To:</b> ' + contact + ' &lt;contact@accenture.com&gt;\n' +
+              '<b>From:</b> ' + currentRep + ' &lt;rep@ibm.com&gt;\n' +
+              '<b>Subject:</b> IBM &amp; Accenture — A Timely Opportunity on watsonx.governance &amp; EU AI Act Compliance\n\n' +
+              'Dear ' + contact + ',\n\nI\'m reaching out because the EU AI Act enforcement timeline creates a compelling and time-sensitive opportunity I\'d like to walk you through personally.\n\nIBM watsonx.governance now includes purpose-built capabilities for model explainability, audit trails, and bias detection — designed specifically for regulated Financial Services AI deployments ahead of the Q3 2026 enforcement deadline.\n\nSeveral comparable firms are already using these capabilities to meet regulatory deadlines ahead of schedule. I\'d love to share those stories in 30 minutes.\n\nAre you available the week of June 23rd?\n\nWarm regards,\n' + currentRep + ' · IBM Global Account Executive\n\n' +
+              '<i style="font-size:11px;color:var(--text-muted)">⚡ Powered by IBM Client Outreach AI Agent (Salesforce + Seismic)</i>';
+     }],
+  ];
+
+  function getResponse(msg) {
+    for (const [test, respond] of BOB_ROUTES) {
+      if (test(msg)) return respond(msg);
+    }
+    return `I'm routing your request through the sales_hub_orchestrator_agent to the most relevant sub-agent for ${currentAccount}.\n\nIn the full watsonx Orchestrate deployment, I'd call the relevant tool and return live data. For this prototype, navigate to the relevant dashboard tab or try one of the suggested questions below.`;
+  }
+
+  // ─────────────────────────────────────────────
+  // CHAT RENDERING
+  // ─────────────────────────────────────────────
+  function appendMessage(html, sender) {
+    const msgs = document.getElementById('chat-messages');
+    // Remove typing indicator if present
+    const typing = msgs.querySelector('.msg-typing');
+    if (typing) typing.remove();
+    const div = document.createElement('div');
+    div.className = 'msg msg-' + sender;
+    const name = sender === 'bob' ? 'Bob · watsonx Orchestrate' : currentRep;
+    div.innerHTML = '<div class="msg-name">' + name + '</div><div class="msg-bubble">' + html.replace(/\n/g, '<br>') + '</div>';
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showTyping() {
+    const msgs = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    div.className = 'msg msg-bob msg-typing';
+    div.innerHTML = '<div class="msg-name">Bob · watsonx Orchestrate</div><div class="msg-bubble" style="color:var(--text-muted)">Routing to sub-agent…</div>';
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function sendChat() {
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+    appendMessage(msg, 'user');
+    input.value = '';
+    showTyping();
+    setTimeout(() => appendMessage(getResponse(msg), 'bob'), 700);
+  }
+
+  function sendSuggestion(btn) {
+    const msg = btn.textContent;
+    appendMessage(msg, 'user');
+    showTyping();
+    setTimeout(() => appendMessage(getResponse(msg), 'bob'), 700);
+  }
+
+  // Clickable sample questions on the Ask Bob tab
+  function askBobSample(el) {
+    const msg = el.textContent;
+    openChat();
+    appendMessage(msg, 'user');
+    showTyping();
+    setTimeout(() => appendMessage(getResponse(msg), 'bob'), 700);
+  }
+
+  // ─────────────────────────────────────────────
+  // CHAT PANEL TOGGLE
+  // ─────────────────────────────────────────────
+  function toggleChat() {
+    document.getElementById('chat-panel').classList.toggle('open');
+  }
+
+  function openChat() {
+    document.getElementById('chat-panel').classList.add('open');
+  }
+
+  // ─────────────────────────────────────────────
+  // MISC
+  // ─────────────────────────────────────────────
+  document.getElementById('battlecard-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeBattlecard();
+  });
+
+  // Style for sample-q links
+  const style = document.createElement('style');
+  style.textContent = '.sample-q { color: var(--ibm-blue); cursor: pointer; text-decoration: none; } .sample-q:hover { text-decoration: underline; }';
+  document.head.appendChild(style);
+</script>
+
+</body>
+</html>
