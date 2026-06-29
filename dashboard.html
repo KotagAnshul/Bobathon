@@ -4,31 +4,34 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>IBM Sales Intelligence Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
     --ibm-blue: #0F62FE;
     --ibm-blue-hover: #0353E9;
-    --bg: #161616;
-    --surface: #262626;
-    --surface-2: #393939;
-    --border: #525252;
-    --text: #F4F4F4;
-    --text-muted: #A8A8A8;
-    --text-disabled: #6F6F6F;
+    --ibm-blue-light: #EDF4FF;
+    --bg: #F5F7FA;
+    --surface: #FFFFFF;
+    --surface-2: #EAECF0;
+    --border: #C6C6C6;
+    --text: #161616;
+    --text-muted: #525252;
+    --text-disabled: #8D8D8D;
     --tag-opportunity: #198038;
-    --tag-opportunity-bg: #071908;
+    --tag-opportunity-bg: #DEFBE6;
     --tag-risk: #DA1E28;
-    --tag-risk-bg: #2D0709;
-    --tag-competitor: #8A3FFC;
-    --tag-competitor-bg: #1C0F30;
-    --tag-exec: #F1C21B;
-    --tag-exec-bg: #302400;
-    --green: #42BE65;
-    --yellow: #F1C21B;
-    --red: #FA4D56;
-    --font: -apple-system, "Segoe UI", system-ui, sans-serif;
+    --tag-risk-bg: #FFF1F1;
+    --tag-competitor: #6929C4;
+    --tag-competitor-bg: #F6F2FF;
+    --tag-exec: #B28600;
+    --tag-exec-bg: #FCF4D6;
+    --green: #198038;
+    --yellow: #B28600;
+    --red: #DA1E28;
+    --font: "IBM Plex Sans", -apple-system, "Segoe UI", system-ui, sans-serif;
   }
 
   body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -50,22 +53,23 @@
   #app.visible { display: flex; }
 
   /* ── TOP BAR ── */
-  .topbar { position: fixed; top: 0; left: 0; right: 0; height: 48px; background: #000; display: flex; align-items: center; padding: 0 16px; gap: 16px; z-index: 100; border-bottom: 1px solid var(--border); }
-  .topbar .ibm-logo { font-size: 18px; font-weight: 700; color: var(--ibm-blue); flex-shrink: 0; }
-  .topbar .app-name { font-size: 13px; color: var(--text-muted); border-left: 1px solid var(--border); padding-left: 16px; }
+  .topbar { position: fixed; top: 0; left: 0; right: 0; height: 48px; background: #0F62FE; display: flex; align-items: center; padding: 0 16px; gap: 16px; z-index: 100; border-bottom: none; }
+  .topbar .ibm-logo { font-size: 18px; font-weight: 700; color: #ffffff; flex-shrink: 0; letter-spacing: 1px; }
+  .topbar .app-name { font-size: 13px; color: rgba(255,255,255,0.75); border-left: 1px solid rgba(255,255,255,0.3); padding-left: 16px; }
   .topbar .spacer { flex: 1; }
-  .topbar .account-badge { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 4px 12px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-  .topbar .account-badge span { color: var(--ibm-blue); font-weight: 600; }
-  .topbar .rep-name { font-size: 13px; color: var(--text-muted); }
+  .topbar .account-badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 4px 12px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .topbar .account-badge span { color: #ffffff; font-weight: 600; }
+  .topbar .rep-name { font-size: 13px; color: rgba(255,255,255,0.8); }
 
   /* ── SIDEBAR ── */
-  .sidebar { width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); margin-top: 48px; overflow-y: auto; display: flex; flex-direction: column; }
-  .sidebar-section { padding: 16px 0 8px; }
-  .sidebar-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-disabled); padding: 0 16px; margin-bottom: 4px; }
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; cursor: pointer; color: var(--text-muted); font-size: 13px; border-left: 2px solid transparent; transition: background 0.1s; }
-  .nav-item:hover { background: var(--surface-2); color: var(--text); }
-  .nav-item.active { background: #0F62FE1A; color: var(--text); border-left-color: var(--ibm-blue); font-weight: 600; }
-  .nav-icon { width: 16px; text-align: center; flex-shrink: 0; }
+  .sidebar { width: 240px; flex-shrink: 0; background: #ffffff; border-right: 1px solid var(--border); margin-top: 48px; overflow-y: auto; display: flex; flex-direction: column; padding: 16px 8px; position: relative; }
+  .sidebar::before { content: ''; position: absolute; left: 20px; top: 0; bottom: 0; width: 1px; background: var(--border); pointer-events: none; }
+  .sidebar-section { padding: 12px 0 4px; }
+  .sidebar-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-disabled); padding: 0 12px 0 28px; margin-bottom: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px 9px 28px; cursor: pointer; color: var(--text-muted); font-size: 13px; font-weight: 400; border-left: 3px solid transparent; border-radius: 0 8px 8px 0; transition: color 0.15s, border-color 0.15s, background 0.15s, box-shadow 0.15s; margin-bottom: 2px; position: relative; }
+  .nav-item:hover { color: var(--text); background: #F4F4F4; }
+  .nav-item.active { color: #ffffff; font-weight: 600; border-left-color: #0F62FE; background: #0F62FE; box-shadow: 0 4px 12px rgba(15,98,254,0.35); border-radius: 0 8px 8px 0; }
+  .nav-icon { width: 16px; text-align: center; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 
   /* ── MAIN ── */
   .main { flex: 1; margin-top: 48px; overflow-y: auto; background: var(--bg); }
@@ -79,7 +83,8 @@
   .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 
   /* ── CARDS ── */
-  .card { background: var(--surface); border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; border-radius: 8px; transition: box-shadow 0.2s, transform 0.2s; }
+  .card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.10); transform: translateY(-2px); }
   .card-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
   .card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
 
@@ -88,23 +93,43 @@
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 
   /* ── TAGS ── */
-  .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.4px; }
-  .tag-opportunity { background: var(--tag-opportunity-bg); color: var(--green); border: 1px solid var(--tag-opportunity); }
-  .tag-risk { background: var(--tag-risk-bg); color: var(--red); border: 1px solid var(--tag-risk); }
-  .tag-competitor { background: var(--tag-competitor-bg); color: #BE95FF; border: 1px solid var(--tag-competitor); }
-  .tag-exec { background: var(--tag-exec-bg); color: var(--yellow); border: 1px solid #684E00; }
-  .tag-strong { background: #071908; color: var(--green); border: 1px solid var(--tag-opportunity); }
-  .tag-moderate { background: #302400; color: var(--yellow); border: 1px solid #684E00; }
-  .tag-cold { background: var(--tag-risk-bg); color: var(--red); border: 1px solid var(--tag-risk); }
-  .tag-advantaged { background: #071908; color: var(--green); border: 1px solid var(--tag-opportunity); }
-  .tag-even { background: #302400; color: var(--yellow); border: 1px solid #684E00; }
-  .tag-at-risk { background: var(--tag-risk-bg); color: var(--red); border: 1px solid var(--tag-risk); }
-  .tag-blue { background: #001141; color: #78A9FF; border: 1px solid #0043CE; }
+  .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.4px; background: #EDF4FF; color: #0043CE; border: 1px solid #C5D9FF; }
+  .tag svg { flex-shrink: 0; }
+  .tag-opportunity { background: #EDF4FF; color: #0043CE; border-color: #C5D9FF; }
+  .tag-risk        { background: #EDF4FF; color: #0043CE; border-color: #C5D9FF; }
+  .tag-competitor  { background: #EDF4FF; color: #0043CE; border-color: #C5D9FF; }
+  .tag-exec        { background: #EDF4FF; color: #0043CE; border-color: #C5D9FF; }
+  .tag-strong      { background: #EDF4FF; color: #0043CE; border-color: #C5D9FF; }
+  .tag-moderate    { background: #EDF4FF; color: #0043CE; border-color: #C5D9FF; }
+  .tag-cold        { background: #EDF4FF; color: #0043CE; border-color: #C5D9FF; }
+  .tag-advantaged  { background: #EDF4FF; color: #0043CE; border-color: #C5D9FF; }
+  .tag-even        { background: #EDF4FF; color: #0043CE; border-color: #C5D9FF; }
+  .tag-at-risk     { background: #EDF4FF; color: #0043CE; border-color: #C5D9FF; }
+  .tag-blue        { background: #EDF4FF; color: #0043CE; border-color: #C5D9FF; }
 
-  /* ── NEWS ITEM ── */
-  .news-item { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ibm-blue); padding: 16px 18px; margin-bottom: 12px; display: flex; gap: 16px; align-items: flex-start; }
-  .news-item.flagged-important { border-left-color: var(--yellow); opacity: 0.7; }
-  .news-item.flagged-dismissed { opacity: 0.35; }
+  /* ── NEWS STAT BAR ── */
+  .news-stat-bar { display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 10px 18px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .news-stat-bar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .news-stat-bar-right { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap; }
+  .news-stat-count { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
+  .news-stat-label { font-size: 13px; color: var(--text-muted); margin-right: 4px; }
+  .news-stat-divider { width: 1px; height: 16px; background: var(--border); display: inline-block; }
+  .industry-alerts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .industry-alert-item { padding-left: 12px; border-left: 2px solid var(--ibm-blue); }
+
+  /* ── NEWS FEED ── */
+  .news-feed { display: flex; flex-direction: column; gap: 12px; }
+  .news-item {
+    display: flex; position: relative; z-index: 0;
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ibm-blue);
+    padding: 20px 20px 16px; gap: 16px; align-items: flex-start;
+    border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+  .news-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+  .news-item.flagged-important { border-left-color: var(--yellow); }
+  .news-item.flagged-dismissed { opacity: 0.38; }
   .news-body { flex: 1; }
   .news-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
   .news-summary { font-size: 13px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
@@ -113,34 +138,84 @@
   .btn-sm:hover { background: var(--surface-2); color: var(--text); }
   .btn-sm.active { background: var(--ibm-blue); color: #fff; border-color: var(--ibm-blue); }
 
+  /* ── NEWS SPOTLIGHT MODAL ── */
+  .news-overlay {
+    display: none; position: fixed; inset: 0; z-index: 2000;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+    animation: overlayIn 0.2s ease;
+  }
+  .news-overlay.open { display: flex; }
+  @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+  .news-spotlight {
+    background: var(--surface);
+    border: 1px solid var(--border); border-left: 4px solid var(--ibm-blue);
+    border-radius: 16px;
+    padding: 32px 32px 28px;
+    width: min(680px, 90vw);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+    display: flex; gap: 24px; align-items: flex-start;
+    animation: spotlightIn 0.25s cubic-bezier(.2,0,.2,1);
+    position: relative;
+  }
+  @keyframes spotlightIn {
+    from { opacity: 0; transform: scale(0.88) translateY(24px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0); }
+  }
+  .news-spotlight .news-body { flex: 1; }
+  .news-spotlight .news-body .news-summary { font-size: 14px; line-height: 1.65; margin-top: 10px; }
+  .news-spotlight .news-body [style*="font-weight:600"] { font-size: 17px; line-height: 1.4; margin-top: 10px; }
+  .news-spotlight .news-actions { flex-direction: column; gap: 8px; }
+  .news-spotlight .btn-sm { font-size: 12px; padding: 6px 14px; }
+  .news-spotlight-close {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted); font-size: 20px; line-height: 1;
+    padding: 4px 8px; border-radius: 6px;
+  }
+  .news-spotlight-close:hover { background: var(--surface-2); color: var(--text); }
+
   /* ── TABLE ── */
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; padding: 8px 12px; border-bottom: 1px solid var(--border); }
-  td { padding: 10px 12px; border-bottom: 1px solid #333; vertical-align: top; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
   tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #2a2a2a; }
+  tr:hover td { background: #EDF4FF; }
 
   /* ── CHIP ── */
-  .chip { display: inline-block; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; padding: 2px 8px; border-radius: 12px; margin: 2px; }
-  .chip.ibm { background: #001141; color: #78A9FF; border-color: #0043CE; }
+  .chip { display: inline-block; background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; padding: 2px 8px; border-radius: 12px; margin: 2px; }
+  .chip.ibm { background: #EDF4FF; color: #0043CE; border-color: #0043CE; }
 
   /* ── MEETING CARD ── */
-  .meeting-card { background: var(--surface); border: 1px solid var(--border); padding: 18px; margin-bottom: 14px; }
-  .meeting-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-  .meeting-title { font-size: 15px; font-weight: 600; }
-  .meeting-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
-  .meeting-attendees { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-  .prep-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 2px; flex-shrink: 0; }
-  .prep-complete { background: #071908; color: var(--green); border: 1px solid var(--tag-opportunity); }
-  .prep-needs { background: #302400; color: var(--yellow); border: 1px solid #684E00; }
-  .prep-no { background: var(--tag-risk-bg); color: var(--red); border: 1px solid var(--tag-risk); }
+  .meeting-card { background: var(--surface); border: 1px solid var(--border); padding: 20px 22px; margin-bottom: 14px; border-radius: 12px; transition: box-shadow 0.2s, transform 0.2s; }
+  .meeting-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.10); transform: translateY(-2px); }
+  .meeting-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; gap: 16px; }
+  .meeting-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 5px; line-height: 1.4; }
+  .meeting-meta { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+  .meeting-meta svg { flex-shrink: 0; }
+  .meeting-attendees { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .attendee-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-disabled); margin-top: 12px; margin-bottom: 4px; }
+  .prep-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 20px; flex-shrink: 0; white-space: nowrap; }
+  .prep-complete { background: #DEFBE6; color: #198038; border: 1px solid #a7f0ba; }
+  .prep-needs   { background: #FCF4D6; color: #B28600; border: 1px solid #f1c21b; }
+  .prep-no      { background: #FFF1F1; color: #DA1E28; border: 1px solid #ffb3b8; }
+  .meeting-hint { font-size: 11px; color: var(--text-disabled); margin-top: 14px; display: flex; align-items: center; gap: 5px; }
 
   /* ── STAT CARDS ── */
-  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); padding: 16px; }
-  .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
-  .stat-value { font-size: 22px; font-weight: 700; color: var(--text); }
-  .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 12px; transition: box-shadow 0.2s, transform 0.2s; display: flex; align-items: flex-start; gap: 14px; }
+  .stat-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.10); transform: translateY(-2px); }
+  .stat-icon-badge { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stat-icon-badge.blue  { background: #EDF4FF; color: #0F62FE; }
+  .stat-icon-badge.green { background: #DEFBE6; color: #198038; }
+  .stat-icon-badge.purple{ background: #F6F2FF; color: #6929C4; }
+  .stat-icon-badge.teal  { background: #D9FBFB; color: #007D79; }
+  .stat-body { flex: 1; }
+  .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .stat-value { font-size: 24px; font-weight: 700; color: var(--text); line-height: 1.1; }
+  .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
 
   /* ── PROGRESS BAR ── */
   .progress-bar { height: 6px; background: var(--surface-2); border-radius: 0; margin-top: 6px; }
@@ -150,13 +225,13 @@
 
   /* ── BULLET SUMMARY ── */
   .bullet-list { list-style: none; }
-  .bullet-list li { padding: 8px 0; border-bottom: 1px solid #333; font-size: 13px; display: flex; gap: 10px; align-items: flex-start; }
+  .bullet-list li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; display: flex; gap: 10px; align-items: flex-start; }
   .bullet-list li:last-child { border-bottom: none; }
   .bullet-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ibm-blue); margin-top: 7px; flex-shrink: 0; }
 
   /* ── AGENT LAUNCHPAD ── */
-  .agent-card { background: var(--surface); border: 1px solid var(--border); padding: 20px; cursor: pointer; transition: border-color 0.15s; }
-  .agent-card:hover { border-color: var(--ibm-blue); }
+  .agent-card { background: var(--surface); border: 1px solid var(--border); padding: 20px; cursor: pointer; border-radius: 8px; transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s; }
+  .agent-card:hover { border-color: var(--ibm-blue); box-shadow: 0 6px 20px rgba(0,0,0,0.10); transform: translateY(-2px); }
   .agent-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
   .agent-card p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
   .agent-icon { font-size: 20px; margin-bottom: 10px; color: var(--ibm-blue); }
@@ -167,44 +242,63 @@
   /* ── MODAL ── */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--ibm-blue); width: 640px; max-height: 80vh; overflow-y: auto; padding: 28px; }
+  .modal { background: #ffffff; border: 1px solid var(--border); border-top: 3px solid var(--ibm-blue); width: 640px; max-height: 80vh; overflow-y: auto; padding: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
   .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
   .modal h2 { font-size: 17px; font-weight: 600; }
   .modal-close { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; line-height: 1; }
   .modal-section { margin-bottom: 18px; }
   .modal-section h4 { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
   .modal-section ul { list-style: none; }
-  .modal-section ul li { padding: 5px 0; font-size: 13px; border-bottom: 1px solid #333; display: flex; gap: 8px; }
+  .modal-section ul li { padding: 5px 0; font-size: 13px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
   .modal-section ul li:last-child { border-bottom: none; }
   .modal-section ul li::before { content: "›"; color: var(--ibm-blue); font-weight: 700; flex-shrink: 0; }
 
-  /* ── CHATBOT ── */
-  .chat-fab { position: fixed; top: 60px; right: 28px; width: auto; height: 36px; border-radius: 2px; background: var(--ibm-blue); border: none; color: #fff; font-size: 13px; font-weight: 600; font-family: var(--font); padding: 0 16px; cursor: pointer; z-index: 150; display: none; align-items: center; gap: 8px; }
+  /* ── CHATBOT FAB ── */
+  .chat-fab { position: fixed; bottom: 28px; right: 28px; height: 44px; border-radius: 22px; background: var(--ibm-blue); border: none; color: #fff; font-size: 13px; font-weight: 600; font-family: var(--font); padding: 0 20px; cursor: pointer; z-index: 150; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(15,98,254,0.35); transition: background 0.15s, box-shadow 0.15s; }
   .chat-fab.visible { display: flex; }
-  .chat-fab:hover { background: var(--ibm-blue-hover); }
-  .chat-panel { position: fixed; top: 104px; right: 28px; width: 380px; height: 520px; background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--ibm-blue); z-index: 150; display: none; flex-direction: column; }
-  .chat-panel.open { display: flex; }
-  .chat-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-  .chat-header h3 { font-size: 14px; font-weight: 600; }
-  .chat-header span { font-size: 11px; color: var(--green); }
-  .chat-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; }
-  .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-  .msg { max-width: 85%; }
+  .chat-fab:hover { background: var(--ibm-blue-hover); box-shadow: 0 6px 20px rgba(15,98,254,0.45); }
+
+  /* ── CHAT FULLSCREEN MODAL ── */
+  .chat-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 400; align-items: center; justify-content: center; }
+  .chat-modal-overlay.open { display: flex; }
+  .chat-modal { background: #ffffff; border-radius: 20px; width: 700px; max-width: calc(100vw - 48px); height: 82vh; max-height: 760px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 32px 80px rgba(0,0,0,0.22); }
+
+  /* Hero header — IBM blue gradient band */
+  .chat-hero-header { background: linear-gradient(135deg, #0F62FE 0%, #0043CE 100%); padding: 36px 32px 28px; position: relative; flex-shrink: 0; }
+  .chat-hero-header-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+  .chat-modal-close { background: rgba(255,255,255,0.15); border: none; cursor: pointer; color: #fff; padding: 6px; border-radius: 8px; display: flex; align-items: center; transition: background 0.15s; }
+  .chat-modal-close:hover { background: rgba(255,255,255,0.25); }
+  .chat-live-badge { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.15); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: rgba(255,255,255,0.9); font-weight: 500; }
+  .chat-live-dot { width: 7px; height: 7px; border-radius: 50%; background: #42BE65; flex-shrink: 0; }
+  .chat-hero-body { display: flex; align-items: center; gap: 20px; }
+  .chat-hero-avatar { width: 72px; height: 72px; flex-shrink: 0; }
+  .chat-hero-text h2 { font-size: 24px; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
+  .chat-hero-text p { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+
+  /* Chips */
+  .chat-chips-row { background: #F4F6FA; padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .chat-hero-chip { background: #ffffff; border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--text-muted); cursor: pointer; font-family: var(--font); transition: border-color 0.15s, color 0.15s, box-shadow 0.15s; }
+  .chat-hero-chip:hover { border-color: var(--ibm-blue); color: var(--ibm-blue); box-shadow: 0 2px 8px rgba(15,98,254,0.12); }
+
+  /* Messages */
+  .chat-messages-area { flex: 1; overflow-y: auto; padding: 20px 24px 8px; display: flex; flex-direction: column; gap: 14px; background: #F4F6FA; }
+  .msg { max-width: 80%; }
   .msg-bob { align-self: flex-start; }
   .msg-user { align-self: flex-end; }
-  .msg-bubble { padding: 10px 14px; font-size: 13px; line-height: 1.5; }
-  .msg-bob .msg-bubble { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); }
-  .msg-user .msg-bubble { background: var(--ibm-blue); color: #fff; }
-  .msg-name { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
+  .msg-bubble { padding: 12px 16px; font-size: 13px; line-height: 1.6; border-radius: 16px; }
+  .msg-bob .msg-bubble { background: #ffffff; border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .msg-user .msg-bubble { background: var(--ibm-blue); color: #fff; border-bottom-right-radius: 4px; }
+  .msg-name { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
   .msg-user .msg-name { text-align: right; }
-  .chat-input-row { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
-  .chat-input-row input { flex: 1; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; font-size: 13px; font-family: var(--font); }
-  .chat-input-row input:focus { outline: 2px solid var(--ibm-blue); outline-offset: 0; }
-  .chat-send { background: var(--ibm-blue); color: #fff; border: none; padding: 8px 14px; cursor: pointer; font-family: var(--font); font-size: 13px; }
-  .chat-send:hover { background: var(--ibm-blue-hover); }
-  .chat-suggestions { padding: 0 16px 10px; display: flex; flex-wrap: wrap; gap: 6px; }
-  .chat-suggest-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; padding: 4px 10px; cursor: pointer; font-family: var(--font); }
-  .chat-suggest-btn:hover { border-color: var(--ibm-blue); color: var(--text); }
+
+  /* Input bar */
+  .chat-bottom { background: #ffffff; border-top: 1px solid var(--border); padding: 16px 24px; }
+  .chat-input-wrap { display: flex; align-items: center; gap: 10px; background: #F4F6FA; border: 1px solid var(--border); border-radius: 12px; padding: 10px 16px; transition: border-color 0.15s, box-shadow 0.15s; }
+  .chat-input-wrap:focus-within { border-color: var(--ibm-blue); box-shadow: 0 0 0 3px rgba(15,98,254,0.12); }
+  .chat-input-wrap input { flex: 1; background: transparent; border: none; outline: none; font-size: 14px; font-family: var(--font); color: var(--text); }
+  .chat-input-wrap input::placeholder { color: var(--text-disabled); }
+  .chat-send-btn { background: var(--ibm-blue); border: none; border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 0.15s, transform 0.1s; }
+  .chat-send-btn:hover { background: var(--ibm-blue-hover); transform: scale(1.05); }
 
   /* ── UTILITY ── */
   .flex-row { display: flex; align-items: center; gap: 10px; }
@@ -218,22 +312,42 @@
   .copy-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 14px; font-size: 12px; cursor: pointer; font-family: var(--font); }
   .copy-btn:hover { background: var(--surface-2); }
   .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .renewal-alert { background: #2D1800; border: 1px solid #684E00; color: var(--yellow); font-size: 12px; padding: 6px 12px; margin-bottom: 8px; }
-  .upsell-alert { background: #001141; border: 1px solid #0043CE; color: #78A9FF; font-size: 12px; padding: 6px 12px; margin-bottom: 8px; }
+  .renewal-alert { background: #FCF4D6; border: 1px solid #B28600; color: #7D4E00; font-size: 12px; padding: 6px 12px; margin-bottom: 8px; }
+  .upsell-alert { background: #EDF4FF; border: 1px solid #0043CE; color: #0043CE; font-size: 12px; padding: 6px 12px; margin-bottom: 8px; }
+
+  /* ── NOTIFICATION FEED ── */
+  .notif-feed { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+  .notif-item { background: #ffffff; border: 1px solid var(--border); border-left: 3px solid var(--ibm-blue); border-radius: 8px; overflow: hidden; cursor: pointer; transition: box-shadow 0.2s; }
+  .notif-item:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .notif-item.open { border-color: var(--ibm-blue); box-shadow: 0 4px 12px rgba(15,98,254,0.10); }
+  .notif-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; }
+  .notif-chevron { margin-left: auto; color: var(--text-disabled); transition: transform 0.3s ease; flex-shrink: 0; }
+  .notif-item.open .notif-chevron { transform: rotate(180deg); }
+  .notif-detail { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.35s ease; padding: 0 14px; }
+  .notif-item.open .notif-detail { max-height: 200px; padding: 0 14px 14px; }
+  .notif-detail-inner { border-top: 1px solid var(--border); padding-top: 12px; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .notif-detail-inner strong { color: var(--text); }
+  .notif-badge { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #EDF4FF; color: #0F62FE; }
+  .notif-badge-warn  { background: #EDF4FF; color: #0F62FE; }
+  .notif-badge-blue  { background: #EDF4FF; color: #0F62FE; }
+  .notif-body { flex: 1; }
+  .notif-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .notif-desc  { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .notif-time  { font-size: 11px; color: var(--text-disabled); white-space: nowrap; }
 
   /* ── TOAST ── */
   #toast-container { position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
-  .toast { background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--ibm-blue); color: var(--text); font-size: 13px; padding: 10px 18px; min-width: 280px; max-width: 460px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  .toast { background: #ffffff; border: 1px solid var(--border); border-left: 3px solid var(--ibm-blue); color: var(--text); font-size: 13px; padding: 10px 18px; min-width: 280px; max-width: 460px; opacity: 0; transition: opacity 0.2s; pointer-events: none; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
   .toast.show { opacity: 1; }
   .toast.toast-success { border-left-color: var(--green); }
   .toast.toast-warn { border-left-color: var(--yellow); }
 
   /* ── LOG NOTE ── */
-  .log-note-row { display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
-  .log-note-row input { flex: 1; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 7px 10px; font-size: 12px; font-family: var(--font); }
-  .log-note-row input:focus { outline: 2px solid var(--ibm-blue); outline-offset: 0; }
-  .log-note-row button { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; font-size: 12px; cursor: pointer; font-family: var(--font); white-space: nowrap; }
-  .log-note-row button:hover { background: var(--ibm-blue); color: #fff; border-color: var(--ibm-blue); }
+  .log-note-row { display: flex; gap: 8px; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
+  .log-note-row input { flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; font-size: 13px; font-family: var(--font); border-radius: 8px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+  .log-note-row input:focus { border-color: var(--ibm-blue); box-shadow: 0 0 0 3px rgba(15,98,254,0.1); }
+  .log-note-row button { background: var(--ibm-blue); border: none; color: #fff; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); white-space: nowrap; border-radius: 8px; transition: background 0.15s; }
+  .log-note-row button:hover { background: var(--ibm-blue-hover); }
 
   /* ── AGENT CARD LOADING ── */
   .agent-card .run-btn { display: inline-block; margin-top: 10px; font-size: 11px; padding: 4px 12px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; font-family: var(--font); }
@@ -255,25 +369,25 @@
   .meeting-card.clickable:hover .meeting-title { color: #78A9FF; }
   .notes-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: flex-start; justify-content: center; padding-top: 60px; overflow-y: auto; }
   .notes-modal-overlay.open { display: flex; }
-  .notes-modal { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--ibm-blue); width: 680px; max-width: calc(100vw - 40px); padding: 28px; margin-bottom: 40px; }
+  .notes-modal { background: #ffffff; border: 1px solid var(--border); border-top: 3px solid var(--ibm-blue); width: 680px; max-width: calc(100vw - 40px); padding: 28px; margin-bottom: 40px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
   .notes-modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
   .notes-modal-header h2 { font-size: 17px; font-weight: 600; max-width: 580px; }
   .notes-modal-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
   .notes-section { margin-bottom: 20px; }
   .notes-section-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-  .note-entry { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #333; }
+  .note-entry { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
   .note-entry:last-child { border-bottom: none; }
   .note-date { font-size: 11px; color: var(--text-muted); white-space: nowrap; padding-top: 2px; min-width: 90px; }
   .note-author { font-size: 11px; color: var(--ibm-blue); white-space: nowrap; padding-top: 2px; min-width: 110px; }
   .note-text { font-size: 13px; line-height: 1.55; }
-  .ai-summary-box { background: #001141; border: 1px solid #0043CE; padding: 16px 18px; }
+  .ai-summary-box { background: #EDF4FF; border: 1px solid #0043CE; padding: 16px 18px; }
   .ai-summary-box-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-  .ai-summary-box-header .bob-label { font-size: 12px; font-weight: 600; color: #78A9FF; text-transform: uppercase; letter-spacing: 0.5px; }
+  .ai-summary-box-header .bob-label { font-size: 12px; font-weight: 600; color: #0043CE; text-transform: uppercase; letter-spacing: 0.5px; }
   .ai-summary-box-header .bob-badge { font-size: 10px; background: var(--ibm-blue); color: #fff; padding: 2px 7px; border-radius: 2px; font-weight: 600; letter-spacing: 0.3px; }
   .ai-summary-body { font-size: 13px; color: var(--text); line-height: 1.65; }
   .ai-summary-body p { margin-bottom: 8px; }
   .ai-summary-body p:last-child { margin-bottom: 0; }
-  .ai-summary-footer { font-size: 11px; color: #78A9FF; margin-top: 10px; opacity: 0.75; }
+  .ai-summary-footer { font-size: 11px; color: #0043CE; margin-top: 10px; opacity: 0.85; }
 </style>
 </head>
 <body>
@@ -317,34 +431,45 @@
     <div class="sidebar-section">
       <div class="sidebar-label">Intelligence</div>
       <div class="nav-item active" onclick="showTab('news')">
-        <span class="nav-icon">📰</span> Morning News
+        <span class="nav-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" fill="currentColor"><path d="M28,6H10A2,2,0,0,0,8,8V20a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V8A2,2,0,0,0,28,6Zm0,14H10V8H28ZM4,20H6V10H4ZM4,24H26v2H4Z"/><rect x="12" y="10" width="6" height="6"/><rect x="20" y="10" width="6" height="2"/><rect x="20" y="14" width="6" height="2"/><rect x="12" y="18" width="14" height="2"/></svg>
+        </span>Morning News
       </div>
       <div class="nav-item" onclick="showTab('account')">
-        <span class="nav-icon">🏢</span> Account Overview
+        <span class="nav-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" fill="currentColor"><path d="M28,2H16a2,2,0,0,0-2,2V14H4a2,2,0,0,0-2,2V30H18V22h4v8H30V4A2,2,0,0,0,28,2ZM10,28H4V22h6Zm0-8H4V16h6Zm8,8H20V22h-2Zm0-8H20V16h-2Zm10,8H22V22h6Zm0-8H22V16h6Zm0-8H16V4H28Z"/></svg>
+        </span>Account Overview
       </div>
       <div class="nav-item" onclick="showTab('competitor')">
-        <span class="nav-icon">⚔️</span> Competitor Analysis
+        <span class="nav-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" fill="currentColor"><path d="M16,2A14,14,0,1,0,30,16,14,14,0,0,0,16,2Zm0,26A12,12,0,1,1,28,16,12,12,0,0,1,16,28ZM21,10l-5,5-5-5-1.5,1.5L15,17l-5.5,5.5L11,24l5-5,5,5,1.5-1.5L17,17l5.5-5.5Z"/></svg>
+        </span>Competitor Analysis
       </div>
       <div class="nav-item" onclick="showTab('exec')">
-        <span class="nav-icon">📋</span> Executive Summary
+        <span class="nav-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" fill="currentColor"><path d="M24,2H8A2,2,0,0,0,6,4V28a2,2,0,0,0,2,2H24a2,2,0,0,0,2-2V4A2,2,0,0,0,24,2Zm0,26H8V4H24ZM10,8H22v2H10Zm0,4H22v2H10Zm0,4H18v2H10Z"/></svg>
+        </span>Executive Summary
       </div>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Relationships</div>
       <div class="nav-item" onclick="showTab('meetings')">
-        <span class="nav-icon">📅</span> Meetings
+        <span class="nav-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" fill="currentColor"><path d="M26,4H24V2H22V4H10V2H8V4H6A2,2,0,0,0,4,6V28a2,2,0,0,0,2,2H26a2,2,0,0,0,2-2V6A2,2,0,0,0,26,4Zm0,24H6V12H26Zm0-18H6V6H8V8h2V6H22V8h2V6h2Z"/><rect x="10" y="16" width="2" height="2"/><rect x="15" y="16" width="2" height="2"/><rect x="20" y="16" width="2" height="2"/><rect x="10" y="21" width="2" height="2"/><rect x="15" y="21" width="2" height="2"/></svg>
+        </span>Meetings
       </div>
       <div class="nav-item" onclick="showTab('partnerships')">
-        <span class="nav-icon">🤝</span> IBM Partnerships
+        <span class="nav-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" fill="currentColor"><path d="M29.41,8.59l-6-6A2,2,0,0,0,22,2H10a2,2,0,0,0-1.41.59l-6,6A2,2,0,0,0,2,10V22a2,2,0,0,0,.59,1.41l6,6A2,2,0,0,0,10,30H22a2,2,0,0,0,1.41-.59l6-6A2,2,0,0,0,30,22V10A2,2,0,0,0,29.41,8.59ZM28,22H22l-6,6-6-6H4V10L10,4H22l6,6ZM15,8h2v8H15Zm0,10h2v2H15Z"/></svg>
+        </span>IBM Partnerships
       </div>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">AI Tools</div>
       <div class="nav-item" onclick="showTab('launchpad')">
-        <span class="nav-icon">🚀</span> Agent Launchpad
-      </div>
-      <div class="nav-item" onclick="showTab('chatbot'); openChat()">
-        <span class="nav-icon">💬</span> Ask Bob
+        <span class="nav-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" fill="currentColor"><path d="M16,2a14,14,0,1,0,14,14A14,14,0,0,0,16,2Zm0,26A12,12,0,1,1,28,16,12,12,0,0,1,16,28Zm-2-5h4V15h3l-5-6-5,6h3Z"/></svg>
+        </span>Agent Launchpad
       </div>
     </div>
   </div>
@@ -359,48 +484,32 @@
         <p>Account-specific news and industry alerts — refreshed daily. In production, powered by Tavily.</p>
       </div>
 
-      <div class="grid-2" style="margin-bottom:20px;">
-        <div class="card">
-          <div class="card-title">Industry Alerts</div>
-          <div style="margin-bottom:12px;">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title">Industry Alerts</div>
+        <div class="industry-alerts-grid">
+          <div class="industry-alert-item">
             <div style="font-weight:600;font-size:13px;">EU AI Act Enforcement Begins Q3 2026</div>
             <div class="text-muted" style="font-size:12px;margin-top:3px;">High-risk AI systems must demonstrate model transparency and audit trails. IBM watsonx.governance directly applies.</div>
           </div>
-          <hr class="divider" style="margin:10px 0;" />
-          <div style="margin-bottom:12px;">
+          <div class="industry-alert-item">
             <div style="font-weight:600;font-size:13px;">Cloud Spending Trends Q2 2026: +28% YoY</div>
             <div class="text-muted" style="font-size:12px;margin-top:3px;">Enterprise AI workloads drive hybrid cloud growth — favours IBM Cloud Pak for Data positioning.</div>
           </div>
-          <hr class="divider" style="margin:10px 0;" />
-          <div>
+          <div class="industry-alert-item">
             <div style="font-weight:600;font-size:13px;">Tech Consulting M&A: 3 Deals Close This Quarter</div>
             <div class="text-muted" style="font-size:12px;margin-top:3px;">AI and data capability consolidation — reassess partner and competitive landscape.</div>
           </div>
         </div>
-        <div class="card">
-          <div class="card-title">News Summary — Accenture</div>
-          <div class="flex-row" style="margin-bottom:8px;">
-            <div class="stat-value" style="font-size:28px;">6</div>
-            <div class="text-muted">news items today</div>
-          </div>
-          <div class="pill-row">
-            <span class="tag tag-opportunity">2 Opportunities</span>
-            <span class="tag tag-risk">1 Risk</span>
-            <span class="tag tag-competitor">1 Competitor Move</span>
-            <span class="tag tag-exec">1 Executive Change</span>
-          </div>
-          <hr class="divider" style="margin:12px 0;" />
-          <div class="text-muted" style="font-size:12px;">Last refreshed: Today, 06:00 AM</div>
-          <div class="text-muted" style="font-size:12px;">Source: Reuters · Bloomberg · WSJ · FT · TechCrunch</div>
-        </div>
       </div>
 
-      <div id="news-feed">
+      <div class="news-feed" id="news-feed">
         <div class="news-item" id="ni-news_001">
           <div class="news-body">
-            <div class="flex-row"><span class="tag tag-competitor">Competitor Move</span></div>
+            <div class="flex-row" style="justify-content:space-between;align-items:center;">
+              <span class="tag tag-competitor"><svg width="10" height="10" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28zM21 10l-5 5-5-5-1.5 1.5L15 17l-5.5 5.5L11 24l5-5 5 5 1.5-1.5L17 17l5.5-5.5z"/></svg>Competitor Move</span>
+              <span class="news-meta" style="margin:0;">Reuters · June 10, 2026 · <span style="color:var(--text-disabled);">Refreshed 06:00 AM</span></span>
+            </div>
             <div style="font-weight:600;margin-top:6px;">Accenture Expands AWS Partnership with $3B Cloud Migration Commitment</div>
-            <div class="news-meta">Reuters · June 10, 2026</div>
             <div class="news-summary">Accenture has announced a deepened strategic alliance with AWS to migrate Fortune 500 clients to cloud infrastructure, potentially displacing IBM Cloud workloads.</div>
           </div>
           <div class="news-actions">
@@ -411,9 +520,11 @@
         </div>
         <div class="news-item" id="ni-news_002">
           <div class="news-body">
-            <div class="flex-row"><span class="tag tag-exec">Executive Change</span></div>
+            <div class="flex-row" style="justify-content:space-between;align-items:center;">
+              <span class="tag tag-exec"><svg width="10" height="10" viewBox="0 0 32 32" fill="currentColor"><path d="M16 4a5 5 0 1 1-5 5 5 5 0 0 1 5-5m0-2a7 7 0 1 0 7 7A7 7 0 0 0 16 2zm10 28h-2v-5a5 5 0 0 0-5-5h-6a5 5 0 0 0-5 5v5H6v-5a7 7 0 0 1 7-7h6a7 7 0 0 1 7 7z"/></svg>Executive Change</span>
+              <span class="news-meta" style="margin:0;">Bloomberg · June 8, 2026 · <span style="color:var(--text-disabled);">Refreshed 06:00 AM</span></span>
+            </div>
             <div style="font-weight:600;margin-top:6px;">Accenture Names New Chief AI Officer Following watsonx Pilot Success</div>
-            <div class="news-meta">Bloomberg · June 8, 2026</div>
             <div class="news-summary">Dr. Priya Nair appointed CAO, citing the successful enterprise AI pilot with IBM watsonx as a key driver. Engage immediately — strong IBM advocate.</div>
           </div>
           <div class="news-actions">
@@ -424,9 +535,11 @@
         </div>
         <div class="news-item" id="ni-news_003">
           <div class="news-body">
-            <div class="flex-row"><span class="tag tag-opportunity">Opportunity</span></div>
+            <div class="flex-row" style="justify-content:space-between;align-items:center;">
+              <span class="tag tag-opportunity"><svg width="10" height="10" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28zm-2-5h4V15h3l-5-6-5 6h3z"/></svg>Opportunity</span>
+              <span class="news-meta" style="margin:0;">Wall Street Journal · June 5, 2026 · <span style="color:var(--text-disabled);">Refreshed 06:00 AM</span></span>
+            </div>
             <div style="font-weight:600;margin-top:6px;">Accenture Q2 2026 Earnings: AI &amp; Cloud Revenue Up 34% YoY</div>
-            <div class="news-meta">Wall Street Journal · June 5, 2026</div>
             <div class="news-summary">Strong Q2 results signal increased enterprise AI budget — prime timing for watsonx expansion proposal.</div>
           </div>
           <div class="news-actions">
@@ -437,9 +550,11 @@
         </div>
         <div class="news-item" id="ni-news_004">
           <div class="news-body">
-            <div class="flex-row"><span class="tag tag-opportunity">Opportunity</span></div>
+            <div class="flex-row" style="justify-content:space-between;align-items:center;">
+              <span class="tag tag-opportunity"><svg width="10" height="10" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28zm-2-5h4V15h3l-5-6-5 6h3z"/></svg>Opportunity</span>
+              <span class="news-meta" style="margin:0;">Financial Times · June 3, 2026 · <span style="color:var(--text-disabled);">Refreshed 06:00 AM</span></span>
+            </div>
             <div style="font-weight:600;margin-top:6px;">EU AI Act Compliance Deadline Pressures Accenture's FS Division</div>
-            <div class="news-meta">Financial Times · June 3, 2026</div>
             <div class="news-summary">IBM watsonx.governance is positioned as a key compliance enabler. Renewal due September 2026 — align timing with EU deadline urgency.</div>
           </div>
           <div class="news-actions">
@@ -450,9 +565,11 @@
         </div>
         <div class="news-item" id="ni-news_005">
           <div class="news-body">
-            <div class="flex-row"><span class="tag tag-risk">Risk</span></div>
+            <div class="flex-row" style="justify-content:space-between;align-items:center;">
+              <span class="tag tag-risk"><svg width="10" height="10" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28z"/><rect x="15" y="8" width="2" height="12"/><rect x="15" y="22" width="2" height="2"/></svg>Risk</span>
+              <span class="news-meta" style="margin:0;">TechCrunch · May 29, 2026 · <span style="color:var(--text-disabled);">Refreshed 06:00 AM</span></span>
+            </div>
             <div style="font-weight:600;margin-top:6px;">Accenture Explores Microsoft Azure OpenAI for Internal Automation</div>
-            <div class="news-meta">TechCrunch · May 29, 2026</div>
             <div class="news-summary">Parallel Azure OpenAI PoC underway — competitive pressure on IBM watsonx deals. Prepare battlecard and governance differentiators.</div>
           </div>
           <div class="news-actions">
@@ -463,9 +580,11 @@
         </div>
         <div class="news-item" id="ni-news_006">
           <div class="news-body">
-            <div class="flex-row"><span class="tag tag-opportunity">Opportunity</span></div>
+            <div class="flex-row" style="justify-content:space-between;align-items:center;">
+              <span class="tag tag-opportunity"><svg width="10" height="10" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28zm-2-5h4V15h3l-5-6-5 6h3z"/></svg>Opportunity</span>
+              <span class="news-meta" style="margin:0;">Supply Chain Dive · May 25, 2026 · <span style="color:var(--text-disabled);">Refreshed 06:00 AM</span></span>
+            </div>
             <div style="font-weight:600;margin-top:6px;">Accenture Sterling Supply Chain Implementation Wins Industry Award</div>
-            <div class="news-meta">Supply Chain Dive · May 25, 2026</div>
             <div class="news-summary">The IBM Sterling-powered implementation won the 2026 Digital Supply Chain Excellence Award — reinforces the IBM–Accenture partnership story.</div>
           </div>
           <div class="news-actions">
@@ -474,7 +593,7 @@
             <button class="btn-sm" onclick="flagNews('news_006','Dismiss',this)">✕ Dismiss</button>
           </div>
         </div>
-      </div>
+      </div><!-- /.news-feed -->
     </div>
 
     <!-- ── TAB: ACCOUNT OVERVIEW ── -->
@@ -485,24 +604,44 @@
       </div>
       <div class="stat-grid">
         <div class="stat-card">
-          <div class="stat-label">Annual Revenue</div>
-          <div class="stat-value">$64.9B</div>
-          <div class="stat-sub">FY2025</div>
+          <div class="stat-icon-badge blue">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" fill="currentColor"><path d="M26,6H22V4a2,2,0,0,0-2-2H12a2,2,0,0,0-2,2V6H6A2,2,0,0,0,4,8V28a2,2,0,0,0,2,2H26a2,2,0,0,0,2-2V8A2,2,0,0,0,26,6ZM12,4h8V6H12ZM26,28H6V8H26Z"/><rect x="11" y="14" width="10" height="2"/><rect x="11" y="19" width="10" height="2"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">Annual Revenue</div>
+            <div class="stat-value">$64.9B</div>
+            <div class="stat-sub">FY2025</div>
+          </div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Employees</div>
-          <div class="stat-value">774K+</div>
-          <div class="stat-sub">Global</div>
+          <div class="stat-icon-badge purple">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" fill="currentColor"><path d="M16,4a5,5,0,1,1-5,5,5,5,0,0,1,5-5m0-2a7,7,0,1,0,7,7A7,7,0,0,0,16,2Z"/><path d="M26,30H24V25a5,5,0,0,0-5-5H13a5,5,0,0,0-5,5v5H6V25a7,7,0,0,1,7-7h6a7,7,0,0,1,7,7Z"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">Employees</div>
+            <div class="stat-value">774K+</div>
+            <div class="stat-sub">Global</div>
+          </div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">IBM Account Tier</div>
-          <div class="stat-value text-blue">Strategic</div>
-          <div class="stat-sub">Since 2004</div>
+          <div class="stat-icon-badge teal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" fill="currentColor"><path d="M16,2A14,14,0,1,0,30,16,14,14,0,0,0,16,2Zm0,26A12,12,0,1,1,28,16,12,12,0,0,1,16,28Z"/><path d="M16,8a1,1,0,1,0,1,1A1,1,0,0,0,16,8Zm-1,5h2v11H15Z"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">IBM Account Tier</div>
+            <div class="stat-value" style="color:#0F62FE">Strategic</div>
+            <div class="stat-sub">Since 2004</div>
+          </div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Relationship Score</div>
-          <div class="stat-value text-green">8.2 / 10</div>
-          <div class="stat-sub">Strong</div>
+          <div class="stat-icon-badge green">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" fill="currentColor"><path d="M16,2A14,14,0,1,0,30,16,14,14,0,0,0,16,2Zm0,26A12,12,0,1,1,28,16,12,12,0,0,1,16,28Z"/><path d="M14,21.5l-5-5,1.4-1.4,3.6,3.6,7.6-7.6,1.4,1.4Z"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">Relationship Score</div>
+            <div class="stat-value" style="color:#198038">8.2 / 10</div>
+            <div class="stat-sub">Strong</div>
+          </div>
         </div>
       </div>
       <div class="grid-2">
@@ -532,11 +671,70 @@
         </div>
       </div>
       <div class="card mt-4">
-        <div class="card-title">Active IBM Products &amp; Licenses</div>
-        <div class="renewal-alert">⚠ Renewal Alert: IBM watsonx.governance — due September 30, 2026 (90 days)</div>
-        <div class="upsell-alert">↑ Upsell Signal: IBM Cloud Pak for Data at 88% utilisation — capacity expansion candidate</div>
-        <div class="upsell-alert">↑ Upsell Signal: IBM Sterling at 93% utilisation — evaluate premium tier upgrade</div>
-        <table style="margin-top:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div class="card-title" style="margin-bottom:0;">Active IBM Products &amp; Licenses</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span id="notif-count" style="font-size:11px;color:var(--text-muted);">3 alerts</span>
+            <button onclick="dismissAllNotifs()" style="font-size:11px;padding:3px 10px;background:transparent;border:1px solid var(--border);border-radius:20px;color:var(--text-muted);cursor:pointer;font-family:var(--font);">Clear all</button>
+          </div>
+        </div>
+        <div class="notif-feed" id="notif-feed">
+          <div class="notif-item" onclick="toggleNotif(this)">
+            <div class="notif-row">
+              <div class="notif-badge notif-badge-warn">
+                <svg width="14" height="14" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28z"/><rect x="15" y="8" width="2" height="12"/><rect x="15" y="22" width="2" height="2"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">Renewal Alert — watsonx.governance</div>
+                <div class="notif-desc">Due September 30, 2026 · 90 days remaining</div>
+              </div>
+              <div class="notif-time">90d</div>
+              <svg class="notif-chevron" width="14" height="14" viewBox="0 0 32 32" fill="currentColor"><path d="M16 22L6 12l1.4-1.4L16 19.2l8.6-8.6L26 12z"/></svg>
+            </div>
+            <div class="notif-detail">
+              <div class="notif-detail-inner">
+                <strong>Action required:</strong> IBM watsonx.governance Professional (800 seats) renews September 30, 2026. Prepare renewal proposal and align with Accenture's EU AI Act compliance timeline — this is a natural upsell to the Enterprise tier. Estimated value: <strong>$2.1M renewal + $600K add-on</strong>.
+              </div>
+            </div>
+          </div>
+          <div class="notif-item" onclick="toggleNotif(this)">
+            <div class="notif-row">
+              <div class="notif-badge notif-badge-blue">
+                <svg width="14" height="14" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28zm-2-5h4V15h3l-5-6-5 6h3z"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">Upsell Signal — Cloud Pak for Data</div>
+                <div class="notif-desc">88% utilisation · capacity expansion candidate</div>
+              </div>
+              <div class="notif-time">Now</div>
+              <svg class="notif-chevron" width="14" height="14" viewBox="0 0 32 32" fill="currentColor"><path d="M16 22L6 12l1.4-1.4L16 19.2l8.6-8.6L26 12z"/></svg>
+            </div>
+            <div class="notif-detail">
+              <div class="notif-detail-inner">
+                <strong>Upsell opportunity:</strong> IBM Cloud Pak for Data Enterprise (1,200 seats) is at 88% capacity utilisation. Accenture's FS division is onboarding 3 new data workloads in Q3. A capacity expansion conversation is timely — estimated incremental value: <strong>$1.2M</strong>.
+              </div>
+            </div>
+          </div>
+          <div class="notif-item" onclick="toggleNotif(this)">
+            <div class="notif-row">
+              <div class="notif-badge notif-badge-blue">
+                <svg width="14" height="14" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28zm-2-5h4V15h3l-5-6-5 6h3z"/></svg>
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">Upsell Signal — IBM Sterling</div>
+                <div class="notif-desc">93% utilisation · evaluate premium tier upgrade</div>
+              </div>
+              <div class="notif-time">Now</div>
+              <svg class="notif-chevron" width="14" height="14" viewBox="0 0 32 32" fill="currentColor"><path d="M16 22L6 12l1.4-1.4L16 19.2l8.6-8.6L26 12z"/></svg>
+            </div>
+            <div class="notif-detail">
+              <div class="notif-detail-inner">
+                <strong>Upsell opportunity:</strong> IBM Sterling Supply Chain Enterprise (450 seats) is at 93% utilisation. Tom Burgess has flagged 12 new supplier integrations that exceed the current EDI stream cap. Premium tier upgrade is the natural next step — estimated value: <strong>$800K</strong>.
+              </div>
+            </div>
+          </div>
+        </div>
+        <table style="margin-top:16px;">
           <thead><tr><th>Product</th><th>License</th><th>Seats</th><th>Renewal</th><th>Usage</th><th>Status</th></tr></thead>
           <tbody>
             <tr>
@@ -571,9 +769,36 @@
         <p>Active competitors — click a row to view the full IBM battlecard.</p>
       </div>
       <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);">
-        <div class="stat-card"><div class="stat-label">Wins (12 mo)</div><div class="stat-value text-green">3</div></div>
-        <div class="stat-card"><div class="stat-label">Losses (12 mo)</div><div class="stat-value text-red">2</div></div>
-        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value text-yellow">2</div></div>
+        <div class="stat-card">
+          <div class="stat-icon-badge green">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" fill="currentColor"><path d="M14,21.5l-5-5,1.4-1.4,3.6,3.6,7.6-7.6,1.4,1.4Z"/><path d="M16,2A14,14,0,1,0,30,16,14,14,0,0,0,16,2Zm0,26A12,12,0,1,1,28,16,12,12,0,0,1,16,28Z"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">Wins (12 mo)</div>
+            <div class="stat-value" style="color:#198038">3</div>
+            <div class="stat-sub">IBM wins</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-badge" style="background:#FFF1F1;color:#DA1E28;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" fill="currentColor"><path d="M16,2A14,14,0,1,0,30,16,14,14,0,0,0,16,2Zm0,26A12,12,0,1,1,28,16,12,12,0,0,1,16,28ZM21,10l-5,5-5-5-1.5,1.5L15,17l-5.5,5.5L11,24l5-5,5,5,1.5-1.5L17,17l5.5-5.5Z"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">Losses (12 mo)</div>
+            <div class="stat-value" style="color:#DA1E28">2</div>
+            <div class="stat-sub">IBM losses</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-badge" style="background:#FCF4D6;color:#B28600;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" fill="currentColor"><path d="M16,2A14,14,0,1,0,30,16,14,14,0,0,0,16,2Zm0,26A12,12,0,1,1,28,16,12,12,0,0,1,16,28Z"/><rect x="15" y="8" width="2" height="12"/><rect x="15" y="22" width="2" height="2"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">Pending</div>
+            <div class="stat-value" style="color:#B28600">2</div>
+            <div class="stat-sub">In evaluation</div>
+          </div>
+        </div>
       </div>
       <div class="card">
         <div class="card-title">Active Competitors</div>
@@ -683,19 +908,25 @@
       <div class="card-title" style="margin-bottom:12px;">Upcoming Meetings</div>
       <div class="meeting-card clickable" onclick="openMeetingNotes('mtg_001', event)">
         <div class="meeting-header">
-          <div>
+          <div style="flex:1;">
             <div class="meeting-title">watsonx Enterprise Expansion — Proposal Review</div>
-            <div class="meeting-meta">📅 June 18, 2026 · 2:00 PM UTC · 60 min · Microsoft Teams</div>
+            <div class="meeting-meta">
+              <svg width="12" height="12" viewBox="0 0 32 32" fill="currentColor"><path d="M26,4H24V2H22V4H10V2H8V4H6A2,2,0,0,0,4,6V28a2,2,0,0,0,2,2H26a2,2,0,0,0,2-2V6A2,2,0,0,0,26,4Zm0,24H6V12H26Zm0-18H6V6H8V8h2V6H22V8h2V6h2Z"/></svg>
+              June 18, 2026 · 2:00 PM UTC · 60 min · Microsoft Teams
+            </div>
           </div>
-          <span class="prep-badge prep-needs">Needs Prep</span>
+          <span class="prep-badge prep-needs">
+            <svg width="10" height="10" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28z"/><rect x="15" y="8" width="2" height="12"/><rect x="15" y="22" width="2" height="2"/></svg>
+            Needs Prep
+          </span>
         </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">IBM Attendees</div>
+        <div class="attendee-label">IBM Attendees</div>
         <div class="meeting-attendees">
           <span class="chip ibm">Sarah Mitchell</span>
           <span class="chip ibm">James Okonkwo</span>
           <span class="chip ibm">Dr. Anita Rowe</span>
         </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:8px;margin-bottom:4px;">Client Attendees</div>
+        <div class="attendee-label">Client Attendees</div>
         <div class="meeting-attendees">
           <span class="chip">Dr. Priya Nair (CAO)</span>
           <span class="chip">Mark Henderson (VP Tech)</span>
@@ -705,22 +936,31 @@
           <input type="text" id="note-mtg_001" placeholder="Log a meeting note…" />
           <button onclick="logNote('mtg_001')">Save Note</button>
         </div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:10px;">Click anywhere on this card to view saved notes →</div>
+        <div class="meeting-hint">
+          <svg width="11" height="11" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28zm-1-9h2v2h-2zm0-10h2v8h-2z"/></svg>
+          Click card to view saved notes
+        </div>
       </div>
       <div class="meeting-card clickable" onclick="openMeetingNotes('mtg_002', event)">
         <div class="meeting-header">
-          <div>
+          <div style="flex:1;">
             <div class="meeting-title">IBM Sterling Q3 Business Review</div>
-            <div class="meeting-meta">📅 June 20, 2026 · 10:00 AM UTC · 90 min · Accenture HQ, New York</div>
+            <div class="meeting-meta">
+              <svg width="12" height="12" viewBox="0 0 32 32" fill="currentColor"><path d="M26,4H24V2H22V4H10V2H8V4H6A2,2,0,0,0,4,6V28a2,2,0,0,0,2,2H26a2,2,0,0,0,2-2V6A2,2,0,0,0,26,4Zm0,24H6V12H26Zm0-18H6V6H8V8h2V6H22V8h2V6h2Z"/></svg>
+              June 20, 2026 · 10:00 AM UTC · 90 min · Accenture HQ, New York
+            </div>
           </div>
-          <span class="prep-badge prep-complete">Prep Complete</span>
+          <span class="prep-badge prep-complete">
+            <svg width="10" height="10" viewBox="0 0 32 32" fill="currentColor"><path d="M14 21.5l-5-5 1.4-1.4 3.6 3.6 7.6-7.6 1.4 1.4z"/><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28z"/></svg>
+            Prep Complete
+          </span>
         </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">IBM Attendees</div>
+        <div class="attendee-label">IBM Attendees</div>
         <div class="meeting-attendees">
           <span class="chip ibm">Sarah Mitchell</span>
           <span class="chip ibm">Chris Adeyemi</span>
         </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:8px;margin-bottom:4px;">Client Attendees</div>
+        <div class="attendee-label">Client Attendees</div>
         <div class="meeting-attendees">
           <span class="chip">Rachel Park (Supply Chain)</span>
           <span class="chip">Tom Burgess (Architect)</span>
@@ -729,23 +969,32 @@
           <input type="text" id="note-mtg_002" placeholder="Log a meeting note…" />
           <button onclick="logNote('mtg_002')">Save Note</button>
         </div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:10px;">Click anywhere on this card to view saved notes →</div>
+        <div class="meeting-hint">
+          <svg width="11" height="11" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28zm-1-9h2v2h-2zm0-10h2v8h-2z"/></svg>
+          Click card to view saved notes
+        </div>
       </div>
       <div class="meeting-card clickable" onclick="openMeetingNotes('mtg_003', event)">
         <div class="meeting-header">
-          <div>
+          <div style="flex:1;">
             <div class="meeting-title">watsonx.governance — EU AI Act Compliance Workshop</div>
-            <div class="meeting-meta">📅 June 25, 2026 · 1:00 PM UTC · 120 min · Microsoft Teams</div>
+            <div class="meeting-meta">
+              <svg width="12" height="12" viewBox="0 0 32 32" fill="currentColor"><path d="M26,4H24V2H22V4H10V2H8V4H6A2,2,0,0,0,4,6V28a2,2,0,0,0,2,2H26a2,2,0,0,0,2-2V6A2,2,0,0,0,26,4Zm0,24H6V12H26Zm0-18H6V6H8V8h2V6H22V8h2V6h2Z"/></svg>
+              June 25, 2026 · 1:00 PM UTC · 120 min · Microsoft Teams
+            </div>
           </div>
-          <span class="prep-badge prep-no">No Brief</span>
+          <span class="prep-badge prep-no">
+            <svg width="10" height="10" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28zM21 10l-5 5-5-5-1.5 1.5L15 17l-5.5 5.5L11 24l5-5 5 5 1.5-1.5L17 17l5.5-5.5z"/></svg>
+            No Brief
+          </span>
         </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">IBM Attendees</div>
+        <div class="attendee-label">IBM Attendees</div>
         <div class="meeting-attendees">
           <span class="chip ibm">Sarah Mitchell</span>
           <span class="chip ibm">Dr. Anita Rowe</span>
           <span class="chip ibm">IBM Legal SME (TBC)</span>
         </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:8px;margin-bottom:4px;">Client Attendees</div>
+        <div class="attendee-label">Client Attendees</div>
         <div class="meeting-attendees">
           <span class="chip">Dr. Priya Nair (CAO)</span>
           <span class="chip">Accenture Legal (TBC)</span>
@@ -755,7 +1004,10 @@
           <input type="text" id="note-mtg_003" placeholder="Log a meeting note…" />
           <button onclick="logNote('mtg_003')">Save Note</button>
         </div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:10px;">Click anywhere on this card to view saved notes →</div>
+        <div class="meeting-hint">
+          <svg width="11" height="11" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26A12 12 0 1 1 28 16 12 12 0 0 1 16 28zm-1-9h2v2h-2zm0-10h2v8h-2z"/></svg>
+          Click card to view saved notes
+        </div>
       </div>
       <hr class="divider" />
       <div class="card-title" style="margin-bottom:12px;">Meeting History (Last 5)</div>
@@ -948,7 +1200,7 @@
     <div class="tab-panel" id="tab-chatbot">
       <div class="section-header">
         <h1>Ask Bob — AI Chatbot</h1>
-        <p>Powered by IBM watsonx Orchestrate · sales_hub_orchestrator_agent · Click any question to fire it into Bob</p>
+        <p>Powered by IBM Sales Intelligence · sales_hub_orchestrator_agent · Click any question to fire it into Bob</p>
       </div>
       <div class="card" style="padding:24px;text-align:center;color:var(--text-muted);">
         <div style="font-size:32px;margin-bottom:12px;">💬</div>
@@ -1008,7 +1260,6 @@
       <div class="ai-summary-box">
         <div class="ai-summary-box-header">
           <span class="bob-label">Bob AI</span>
-          <span class="bob-badge">watsonx Orchestrate</span>
         </div>
         <div class="ai-summary-body" id="notes-modal-ai-summary"></div>
         <div class="ai-summary-footer">⚡ Generated by sales_hub_orchestrator_agent · meetings_relationships_agent</div>
@@ -1017,33 +1268,141 @@
   </div>
 </div>
 
-<!-- ═══════════════════ CHAT FAB + PANEL ═══════════════════ -->
-<button class="chat-fab" onclick="toggleChat()" id="chat-fab">💬 Ask Bob</button>
-<div class="chat-panel" id="chat-panel">
-  <div class="chat-header">
-    <div>
-      <h3>Ask Bob</h3>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">sales_hub_orchestrator_agent</div>
+<!-- ═══════════════════ CHAT FAB ═══════════════════ -->
+<button class="chat-fab" onclick="openChat()" id="chat-fab">
+  <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor"><path d="M17.74,30,16,29l4-7H8A2,2,0,0,1,6,20V6A2,2,0,0,1,8,4H24a2,2,0,0,1,2,2V20a2,2,0,0,1-2,2H20.86ZM8,6V20H22.31l-2.05,3.58L21.74,25,24,20.72V20h0V6Z"/><rect x="11" y="11" width="10" height="2"/><rect x="11" y="15" width="6" height="2"/></svg>
+  Ask Bob
+</button>
+
+<!-- ═══════════════════ CHAT FULLSCREEN MODAL ═══════════════════ -->
+<div class="chat-modal-overlay" id="chat-modal-overlay" onclick="if(event.target===this)closeChat()">
+  <div class="chat-modal">
+
+    <!-- Blue hero header — always visible -->
+    <div class="chat-hero-header">
+      <div class="chat-hero-header-top">
+        <div class="chat-live-badge">
+          <span class="chat-live-dot"></span>
+          Live · sales_hub_orchestrator_agent
+        </div>
+        <button class="chat-modal-close" onclick="closeChat()">
+          <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor"><path d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4 14.6 16 8 22.6 9.4 24 16 17.4 22.6 24 24 22.6 17.4 16z"/></svg>
+        </button>
+      </div>
+      <div class="chat-hero-body">
+        <div class="chat-hero-text">
+          <h2>Hi, I'm Bob</h2>
+          <p>Your IBM Sales Intelligence assistant — ask me anything about <strong style="color:#fff;" id="chat-hero-account">Accenture</strong>.</p>
+        </div>
+      </div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span style="font-size:11px;color:var(--green);">● Live</span>
-      <button class="chat-close" onclick="toggleChat()">✕</button>
+
+    <!-- Quick-start chips -->
+    <div class="chat-chips-row">
+      <button class="chat-hero-chip" onclick="sendChip(this)">Exec summary for today</button>
+      <button class="chat-hero-chip" onclick="sendChip(this)">Competitors at Accenture?</button>
+      <button class="chat-hero-chip" onclick="sendChip(this)">Upcoming meetings</button>
+      <button class="chat-hero-chip" onclick="sendChip(this)">Salesforce pipeline</button>
+      <button class="chat-hero-chip" onclick="sendChip(this)">What's new this week?</button>
     </div>
-  </div>
-  <div class="chat-messages" id="chat-messages"></div>
-  <div class="chat-suggestions">
-    <button class="chat-suggest-btn" onclick="sendSuggestion(this)">Exec summary for today</button>
-    <button class="chat-suggest-btn" onclick="sendSuggestion(this)">Competitor risks?</button>
-    <button class="chat-suggest-btn" onclick="sendSuggestion(this)">Upcoming meetings</button>
-    <button class="chat-suggest-btn" onclick="sendSuggestion(this)">Salesforce pipeline</button>
-  </div>
-  <div class="chat-input-row">
-    <input type="text" id="chat-input" placeholder="Ask Bob anything about Accenture…" onkeydown="if(event.key==='Enter')sendChat()" />
-    <button class="chat-send" onclick="sendChat()">Send</button>
+
+    <!-- Messages -->
+    <div class="chat-messages-area" id="chat-messages"></div>
+
+    <!-- Input -->
+    <div class="chat-bottom">
+      <div class="chat-input-wrap">
+        <input type="text" id="chat-input" placeholder="Ask Bob anything about Accenture…" onkeydown="if(event.key==='Enter')sendChat()" />
+        <button class="chat-send-btn" onclick="sendChat()">
+          <svg width="14" height="14" viewBox="0 0 32 32" fill="white"><path d="M27.71 4.29a1 1 0 0 0-1.05-.23l-22 8a1 1 0 0 0 0 1.87l9.6 3.84 3.84 9.6A1 1 0 0 0 19 28h.06a1 1 0 0 0 .91-.66l8-22a1 1 0 0 0-.26-1.05z"/></svg>
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
+  // ─────────────────────────────────────────────
+  // NEWS SPOTLIGHT — click a card to expand it
+  // fullscreen over a dark overlay
+  // ─────────────────────────────────────────────
+  function initNewsStack() {
+    const feed = document.getElementById('news-feed');
+    if (!feed) return;
+
+    // Build the overlay + spotlight container once
+    const overlay = document.createElement('div');
+    overlay.className = 'news-overlay';
+    overlay.innerHTML = '<div class="news-spotlight" id="news-spotlight-inner"></div>';
+    document.body.appendChild(overlay);
+
+    const spotlight = overlay.querySelector('#news-spotlight-inner');
+
+    function closeSpotlight() {
+      overlay.classList.remove('open');
+      spotlight.innerHTML = '';
+    }
+
+    // Close on overlay background click
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeSpotlight();
+    });
+
+    // Wire each card
+    feed.querySelectorAll('.news-item').forEach((el) => {
+      el.addEventListener('click', function(e) {
+        if (e.target.closest('button')) return;
+        // Clone the card content into the spotlight
+        spotlight.innerHTML = '';
+        const clone = el.cloneNode(true);
+        // Re-wire the action buttons on the clone to affect the original
+        clone.querySelectorAll('.btn-sm').forEach((btn, i) => {
+          const orig = el.querySelectorAll('.btn-sm')[i];
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            orig.click();
+            closeSpotlight();
+          });
+        });
+        // Add close button
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'news-spotlight-close';
+        closeBtn.innerHTML = '&#x2715;';
+        closeBtn.addEventListener('click', closeSpotlight);
+        spotlight.appendChild(closeBtn);
+        spotlight.appendChild(clone.querySelector('.news-body').cloneNode(true));
+        const actions = clone.querySelector('.news-actions');
+        if (actions) {
+          const a = actions.cloneNode(true);
+          a.querySelectorAll('.btn-sm').forEach((btn, i) => {
+            const orig = el.querySelectorAll('.btn-sm')[i];
+            btn.addEventListener('click', function(e) {
+              e.stopPropagation();
+              orig.click();
+              closeSpotlight();
+            });
+          });
+          spotlight.appendChild(a);
+        }
+        overlay.classList.add('open');
+      });
+    });
+  }
+
+  // ─────────────────────────────────────────────
+  // NOTIFICATION TOGGLE (expand/collapse drawer)
+  // ─────────────────────────────────────────────
+  function toggleNotif(el) {
+    const isOpen = el.classList.contains('open');
+    // Close all others first
+    document.querySelectorAll('#notif-feed .notif-item.open').forEach(n => n.classList.remove('open'));
+    if (!isOpen) el.classList.add('open');
+  }
+
+  function dismissAllNotifs() {
+    document.querySelectorAll('#notif-feed .notif-item.open').forEach(n => n.classList.remove('open'));
+  }
+
   // ─────────────────────────────────────────────
   // STATE
   // ─────────────────────────────────────────────
@@ -1061,12 +1420,16 @@
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').classList.add('visible');
     document.getElementById('chat-fab').classList.add('visible');
+    const heroAccount = document.getElementById('chat-hero-account');
+    if (heroAccount) heroAccount.textContent = currentAccount;
     // Stamp all section-account spans
     document.querySelectorAll('.section-account').forEach(el => el.textContent = currentAccount);
     // Stamp exec summary metadata
     document.getElementById('exec-rep-name').textContent = currentRep;
     const now = new Date();
     document.getElementById('exec-date').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    // Init news card stack
+    requestAnimationFrame(initNewsStack);
     // Seed Bob's greeting with the rep name
     appendMessage(
       'Good morning, ' + currentRep.split(' ')[0] + '. I\'m Bob, your IBM Sales Intelligence assistant — ' +
@@ -1475,6 +1838,13 @@
     setTimeout(() => appendMessage(getResponse(msg), 'bob'), 700);
   }
 
+  function sendChip(btn) {
+    const msg = btn.textContent;
+    appendMessage(msg, 'user');
+    showTyping();
+    setTimeout(() => appendMessage(getResponse(msg), 'bob'), 700);
+  }
+
   function sendSuggestion(btn) {
     const msg = btn.textContent;
     appendMessage(msg, 'user');
@@ -1492,14 +1862,15 @@
   }
 
   // ─────────────────────────────────────────────
-  // CHAT PANEL TOGGLE
+  // CHAT MODAL OPEN / CLOSE
   // ─────────────────────────────────────────────
-  function toggleChat() {
-    document.getElementById('chat-panel').classList.toggle('open');
+  function openChat() {
+    document.getElementById('chat-modal-overlay').classList.add('open');
+    document.getElementById('chat-input').focus();
   }
 
-  function openChat() {
-    document.getElementById('chat-panel').classList.add('open');
+  function closeChat() {
+    document.getElementById('chat-modal-overlay').classList.remove('open');
   }
 
   // ─────────────────────────────────────────────
@@ -1589,6 +1960,7 @@
     if (e.key === 'Escape') {
       closeMeetingNotes();
       closeBattlecard();
+      closeChat();
     }
   });
 </script>
