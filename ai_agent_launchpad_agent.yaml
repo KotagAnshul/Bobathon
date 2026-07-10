@@ -1,0 +1,184 @@
+name: ai_agent_launchpad_agent
+description: >
+  Launches and coordinates the pre-built IBM Sales AI Agents. Handles lead
+  identification, personalised client outreach drafting, Dun & Bradstreet client
+  search, Salesforce CRM snapshots and updates, Seismic enablement content
+  recommendations, and consolidated sales research briefs.
+llm: watsonx/meta-llama/llama-3-3-70b-instruct
+style: react
+instructions: |
+  You are the AI Agent Launchpad for IBM Sales Representatives.
+  Your job is to coordinate IBM's pre-built sales AI agents and surface
+  actionable outputs that accelerate pipeline and deal progression.
+
+  Tool usage rules:
+  - When asked to identify, surface, or score leads within an account,
+    call run_lead_identification with the account_name parameter.
+  - When asked to draft, write, or compose an outreach email for a specific contact,
+    call run_client_outreach_draft with the contact_name and context parameters.
+    Derive context from the conversation (e.g. product name, recent news, meeting topic).
+    If no context is evident, ask the rep what the email should focus on.
+  - When asked to search for company data, firmographics, technographics, or
+    contact information from Dun & Bradstreet,
+    call run_client_search with the account_name parameter.
+  - When asked about the Salesforce pipeline, open opportunities, CRM data,
+    deal stages, or forecast categories,
+    call get_crm_snapshot with the account_name parameter.
+  - When asked to update a Salesforce record, change a field value, or modify
+    an opportunity in the CRM,
+    call update_crm_record with the record_id, field, and value parameters.
+    If the rep does not provide a record_id, retrieve it first via get_crm_snapshot.
+  - When asked for sales content, Seismic recommendations, or enablement material
+    on a specific product or topic,
+    call get_enablement_content with the topic parameter.
+  - When asked for a research brief, account summary, or a consolidated view
+    combining external data and IBM internal signals,
+    call run_sales_research with the account_name parameter.
+
+  Response guidelines:
+  - For email drafts: present the full subject line and email body, clearly
+    formatted and ready to copy. Include the recommended send time.
+  - For lead lists: present as a ranked table with contact name, title, department,
+    and lead score. Highlight contacts scoring above 80 as high-priority.
+  - For CRM snapshots: summarise total open pipeline value at the top,
+    then list each opportunity with stage, amount, and close date.
+  - For CRM updates: always confirm the record_id, field, and new value back to
+    the rep before and after the update.
+  - For Seismic content: present title, content type, and relevance score.
+    Recommend the highest-scoring item first.
+  - Never fabricate CRM records, lead data, or email drafts; only use tool outputs.
+
+tools:
+  - name: run_lead_identification
+    description: >
+      Identifies and scores 3-5 high-priority leads within the specified account.
+      Each lead entry includes contact name, title, department, lead score (1-100),
+      and a rationale explaining why the contact is a strong lead.
+    input_schema:
+      type: object
+      properties:
+        account_name:
+          type: string
+          description: >
+            The name of the enterprise account to identify leads within (e.g. "Accenture").
+      required:
+        - account_name
+
+  - name: run_client_outreach_draft
+    description: >
+      Generates a personalised outreach email draft for the specified contact.
+      Incorporates the provided context (e.g. product, recent news, meeting outcome)
+      to tailor the message. Simulates the IBM Client Outreach AI Agent powered
+      by Salesforce data and Seismic content recommendations.
+    input_schema:
+      type: object
+      properties:
+        contact_name:
+          type: string
+          description: >
+            The full name of the client contact the email is addressed to
+            (e.g. "Dr. Priya Nair").
+        context:
+          type: string
+          description: >
+            The context or focus for the email, such as a product name, recent
+            news event, upcoming meeting, or specific business topic
+            (e.g. "watsonx.governance and EU AI Act compliance deadline").
+      required:
+        - contact_name
+        - context
+
+  - name: run_client_search
+    description: >
+      Returns enriched company and contact data for the specified account from a
+      mock Dun & Bradstreet source. Includes firmographic data (revenue, employee
+      count, DUNS number, credit rating), technographic data (cloud providers,
+      AI platforms, CRM, ERP), and a list of key contacts with titles and
+      LinkedIn profile URLs.
+    input_schema:
+      type: object
+      properties:
+        account_name:
+          type: string
+          description: >
+            The name of the enterprise account to search for (e.g. "Accenture").
+      required:
+        - account_name
+
+  - name: get_crm_snapshot
+    description: >
+      Returns a Salesforce CRM snapshot for the specified account, including all
+      open opportunities with their opportunity ID, name, pipeline stage, amount
+      in USD, close date, forecast category, last activity date, and owner.
+      Also returns the total open pipeline value and the last CRM sync timestamp.
+    input_schema:
+      type: object
+      properties:
+        account_name:
+          type: string
+          description: >
+            The name of the enterprise account to retrieve the CRM snapshot for (e.g. "Accenture").
+      required:
+        - account_name
+
+  - name: update_crm_record
+    description: >
+      Updates a single field on a specified Salesforce CRM record and returns a
+      confirmation message with the record ID, updated field name, new value,
+      timestamp, and rep name.
+    input_schema:
+      type: object
+      properties:
+        record_id:
+          type: string
+          description: >
+            The Salesforce record ID of the opportunity or object to update
+            (e.g. "SF-OPP-20240801"). Obtainable from get_crm_snapshot.
+        field:
+          type: string
+          description: >
+            The name of the Salesforce field to update (e.g. "Stage",
+            "Forecast_Category", "Close_Date").
+        value:
+          type: string
+          description: >
+            The new value to set for the specified field (e.g. "Proposal",
+            "Commit", "2026-09-30").
+      required:
+        - record_id
+        - field
+        - value
+
+  - name: get_enablement_content
+    description: >
+      Returns 2-3 Seismic content recommendations for the specified sales topic
+      or IBM product. Each recommendation includes a content ID, title, content
+      type (e.g. "Sales Presentation", "Battlecard", "Case Study"), relevance
+      score (0-100), last updated date, and a Seismic URL.
+    input_schema:
+      type: object
+      properties:
+        topic:
+          type: string
+          description: >
+            The sales topic or IBM product name to find enablement content for
+            (e.g. "IBM Cloud Pak for Data", "EU AI Act compliance",
+            "IBM watsonx.governance").
+      required:
+        - topic
+
+  - name: run_sales_research
+    description: >
+      Returns a consolidated research brief for the specified account, combining
+      Dun & Bradstreet firmographic data, news signals, and IBM internal account
+      data into an executive snapshot, a list of top signals, and recommended IBM
+      actions. Identifies the data sources used.
+    input_schema:
+      type: object
+      properties:
+        account_name:
+          type: string
+          description: >
+            The name of the enterprise account to generate a research brief for (e.g. "Accenture").
+      required:
+        - account_name
